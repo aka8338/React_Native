@@ -2,6 +2,11 @@
   "expo": {
     "name": "Sorghum_Disease_Identifier_App",
     "slug": "Sorghum_Disease_Identifier_App",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "splash": {
+      "image": "./src/assets/splashscreen_logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    }
   }
 }
