@@ -1,7 +1,15 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import * as Location from "expo-location"; // For getting user's location
+import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const API_KEY = "7a6b1217f4134a526ee5bca3e084348b"; // Replace with your OpenWeatherMap API key
 
@@ -9,26 +17,43 @@ const WeatherReport = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [locationInput, setLocationInput] = useState("");
+  const [backgroundImage, setBackgroundImage] = useState(null);
 
   useEffect(() => {
     fetchWeather();
   }, []);
 
-  const fetchWeather = async () => {
+  const fetchWeather = async (location = null) => {
     try {
-      // Request location permission
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setError("Location permission denied");
-        setLoading(false);
-        return;
+      let latitude, longitude;
+
+      if (location) {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${API_KEY}`
+        );
+        const data = await response.json();
+        if (response.ok) {
+          latitude = data.coord.lat;
+          longitude = data.coord.lon;
+        } else {
+          setError("Location not found");
+          setLoading(false);
+          return;
+        }
+      } else {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setError("Location permission denied");
+          setLoading(false);
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        latitude = location.coords.latitude;
+        longitude = location.coords.longitude;
       }
 
-      // Get user's current location
-      let location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-
-      // Fetch weather data from OpenWeatherMap API
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${API_KEY}`
       );
@@ -38,10 +63,10 @@ const WeatherReport = () => {
         setWeatherData({
           location: data.name,
           temperature: `${Math.round(data.main.temp)}°C`,
-          sunset: new Date(data.sys.sunset * 1000).toLocaleTimeString(),
-          rainForecast: data.weather[0].description, // e.g., "light rain"
+          condition: data.weather[0].main,
           weatherIcon: getWeatherIcon(data.weather[0].main),
         });
+        setBackgroundImage(getBackgroundImage(data.weather[0].main));
       } else {
         setError("Failed to fetch weather data");
       }
@@ -51,7 +76,6 @@ const WeatherReport = () => {
     setLoading(false);
   };
 
-  // Function to map OpenWeatherMap conditions to MaterialCommunityIcons
   const getWeatherIcon = (condition) => {
     const icons = {
       Clear: "weather-sunny",
@@ -65,50 +89,97 @@ const WeatherReport = () => {
     return icons[condition] || "weather-cloudy";
   };
 
+  const getBackgroundImage = (condition) => {
+    const images = {
+      Clear: require("../assets/clear.jpg"),
+      Clouds: require("../assets/clouds.jpg"),
+      Rain: require("../assets/rain.jpg"),
+      Drizzle: require("../assets/drizzle.jpg"),
+      Thunderstorm: require("../assets/thunderstorm.jpg"),
+      Snow: require("../assets/snow.jpg"),
+      Mist: require("../assets/mist.jpg"),
+    };
+    return images[condition] || require("../assets/default.jpg");
+  };
+
+  const handleLocationChange = () => {
+    if (locationInput.trim()) {
+      setLoading(true);
+      fetchWeather(locationInput.trim());
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Weather Report</Text>
+    <ImageBackground
+      source={backgroundImage}
+      style={styles.backgroundImage}
+      blurRadius={2}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Weather Report</Text>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#148F55" />
-      ) : error ? (
-        <Text style={styles.error}>{error}</Text>
-      ) : (
-        <View style={styles.card}>
-          <View style={styles.textContainer}>
-            <Text style={styles.location}>{weatherData.location}</Text>
-            <Text style={styles.temperature}>{weatherData.temperature}</Text>
-            <Text style={styles.sunset}>☀️ Sunset: {weatherData.sunset}</Text>
-            <Text style={styles.rainForecast}>{weatherData.rainForecast}</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#148F55" />
+        ) : error ? (
+          <Text style={styles.error}>{error}</Text>
+        ) : (
+          <View style={styles.card}>
+            <View style={styles.textContainer}>
+              <Text style={styles.location}>{weatherData.location}</Text>
+              <Text style={styles.temperature}>{weatherData.temperature}</Text>
+              <Text style={styles.condition}>{weatherData.condition}</Text>
+            </View>
+
+            <MaterialCommunityIcons
+              name={weatherData.weatherIcon}
+              size={50}
+              color="#333"
+              style={styles.weatherIcon}
+            />
           </View>
+        )}
 
-          <MaterialCommunityIcons
-            name={weatherData.weatherIcon}
-            size={50}
-            color="#333"
-            style={styles.weatherIcon}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Enter location"
+            value={locationInput}
+            onChangeText={setLocationInput}
           />
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={handleLocationChange}
+          >
+            <Text style={styles.searchButtonText}>Search</Text>
+          </TouchableOpacity>
         </View>
-      )}
-    </View>
+      </View>
+    </ImageBackground>
   );
 };
 
-// Styling
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover",
+  },
   container: {
+    flex: 1,
     padding: 16,
+    justifyContent: "center",
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 20,
   },
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
     padding: 16,
     borderRadius: 10,
     shadowColor: "#000",
@@ -121,22 +192,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   location: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
   },
   temperature: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#000",
   },
-  sunset: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 5,
-  },
-  rainForecast: {
-    fontSize: 14,
+  condition: {
+    fontSize: 16,
     color: "#555",
     marginTop: 5,
   },
@@ -146,6 +212,28 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     textAlign: "center",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  searchInput: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  searchButton: {
+    backgroundColor: "#148F55",
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 

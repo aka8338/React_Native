@@ -31,7 +31,7 @@ const SplashScreen = ({ navigation }) => {
     {
       image: require("../assets/welcome3.png"),
       text: "",
-      subText: "Recive farming advice about how to improve your yield",
+      subText: "Receive farming advice about how to improve your yield",
       caption: " Cultivation Tips",
     },
   ];
@@ -71,14 +71,14 @@ const SplashScreen = ({ navigation }) => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
-      useNativeDriver: true,
+      useNativeDriver: false, // Set to false for opacity animations
     }).start();
 
     colorAnim.setValue(0);
     Animated.timing(colorAnim, {
       toValue: 1,
       duration: 2000,
-      useNativeDriver: false,
+      useNativeDriver: false, // Set to false for color animations
     }).start();
   }, [currentPage]);
 
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontWeight: "bold",
-
     color: "#006400",
     lineHeight: 30,
   },

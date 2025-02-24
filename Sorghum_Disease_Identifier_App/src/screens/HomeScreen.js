@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Footer from "../components/Footer";
 import WeatherReport from "../components/TemperatureDisplay";
 
@@ -8,11 +8,6 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       {/* Weather report is now at the top */}
       <WeatherReport />
-
-      {/* Heading below the weather report */}
-      <Text style={styles.heading}>
-        Welcome to the Disease Identification App!
-      </Text>
 
       {/* Footer at the bottom */}
       <Footer navigation={navigation} />
