@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const SplashScreen = ({ navigation }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -27,13 +27,6 @@ const SplashScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{pages[currentPage]}</Text>
-
-      {currentPage === pages.length - 1 && (
-        <Image
-          source={require("../assets/splashscreen_logo.png")}
-          style={styles.nextImage}
-        />
-      )}
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={handleBack} disabled={currentPage === 0}>
@@ -63,11 +56,6 @@ const SplashScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  nextImage: {
-    width: 100, // Adjust the size as needed
-    height: 100, // Adjust height to maintain aspect ratio
-    marginTop: 20,
-  },
   footer: {
     position: "absolute",
     bottom: 30, // Adjust the distance from the bottom of the screen
