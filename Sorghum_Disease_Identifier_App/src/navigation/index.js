@@ -4,6 +4,9 @@ import React from "react";
 import SplashScreen from "../components/SplashScreen";
 import HomeScreen from "../screens/HomeScreen";
 import IdentificationScreen from "../screens/IdentificationScreen";
+import OTPScreen from "../screens/OTPScreen";
+import SignUpScreen from "../screens/SignUpScreen";
+import SignInScreen from "../screens/SignInScreen";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +19,21 @@ const AppNavigator = () => {
           component={SplashScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen 
+          name="SignUp" 
+          component={SignUpScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="OTP" 
+          component={OTPScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="Signin" 
+          component={SignInScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Identification" component={IdentificationScreen} />
       </Stack.Navigator>
@@ -23,4 +41,4 @@ const AppNavigator = () => {
   );
 };
 
-export default AppNavigator;
+export default AppNavigator; 

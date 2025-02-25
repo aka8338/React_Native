@@ -40,9 +40,7 @@ const SplashScreen = ({ navigation }) => {
     if (currentPage < pages.length - 1) {
       setCurrentPage(currentPage + 1);
       setWordIndex(0);
-    } else {
-      navigation.navigate("Home");
-    }
+    } 
   };
 
   const handleBack = () => {
@@ -115,17 +113,20 @@ const SplashScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("Signin")}
           >
             <Text style={styles.loginText}>Log in</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={handleBack} disabled={currentPage === 0}>
-          <Text style={styles.navigationText}>{"<"}</Text>
-        </TouchableOpacity>
+<View style={styles.footer}>
+        {currentPage > 0 && (
+          <TouchableOpacity onPress={handleBack}>
+            <Text style={styles.navigationText}>{"<"}</Text>
+          </TouchableOpacity>
+        )}
+        {currentPage === 0 && <View style={{ width: 28 }} />}
 
         <View style={styles.pageIndicatorContainer}>
           {pages.map((_, index) => (
@@ -141,10 +142,13 @@ const SplashScreen = ({ navigation }) => {
           ))}
         </View>
 
-        <TouchableOpacity onPress={handleNext}>
-          <Text style={styles.navigationText}>{">"}</Text>
-        </TouchableOpacity>
-      </View>
+        {currentPage < pages.length - 1 && (
+          <TouchableOpacity onPress={handleNext}>
+            <Text style={styles.navigationText}>{">"}</Text>
+          </TouchableOpacity>
+        )}
+        {currentPage === pages.length - 1 && <View style={{ width: 28 }} />}
+      </View> 
     </View>
   );
 };
