@@ -8,6 +8,7 @@ import OTPScreen from "../screens/OTPScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
