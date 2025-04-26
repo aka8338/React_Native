@@ -8,8 +8,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
+import ScreenWithFooter from "../components/ScreenWithFooter";
 
-const IdentificationScreen = () => {
+const IdentificationScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleCamera = async () => {
@@ -39,43 +42,45 @@ const IdentificationScreen = () => {
   };
 
   return (
-    <ImageBackground
-      source={require("../assets/background-image.png")}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Text style={styles.instructionText}>Touch to identify</Text>
+    <ScreenWithFooter navigation={navigation}>
+      <ImageBackground
+        source={require("../assets/background-image.png")}
+        style={styles.background}
+      >
+        <View style={styles.container}>
+          <Text style={styles.instructionText}>{t("identification.touchToIdentify")}</Text>
 
-        <Image source={require("../assets/arrow.png")} style={styles.arrow} />
+          <Image source={require("../assets/arrow.png")} style={styles.arrow} />
 
-        {/* Camera Button */}
-        <TouchableOpacity style={styles.cameraButton} onPress={handleCamera}>
-          <Image
-            source={require("../assets/camera-icon.png")}
-            style={styles.cameraIcon}
-          />
-        </TouchableOpacity>
-
-        {/* Gallery Button */}
-        <View style={styles.galleryContainer}>
-          <TouchableOpacity
-            style={styles.galleryButton}
-            onPress={handleGallery}
-          >
+          {/* Camera Button */}
+          <TouchableOpacity style={styles.cameraButton} onPress={handleCamera}>
             <Image
-              source={require("../assets/gallery-icon.png")}
-              style={styles.galleryIcon}
+              source={require("../assets/camera-icon.png")}
+              style={styles.cameraIcon}
             />
           </TouchableOpacity>
-          <Text style={styles.galleryText}>Gallery</Text>
-        </View>
 
-        {/* Display selected image */}
-        {selectedImage && (
-          <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
-        )}
-      </View>
-    </ImageBackground>
+          {/* Gallery Button */}
+          <View style={styles.galleryContainer}>
+            <TouchableOpacity
+              style={styles.galleryButton}
+              onPress={handleGallery}
+            >
+              <Image
+                source={require("../assets/gallery-icon.png")}
+                style={styles.galleryIcon}
+              />
+            </TouchableOpacity>
+            <Text style={styles.galleryText}>{t("identification.gallery")}</Text>
+          </View>
+
+          {/* Display selected image */}
+          {selectedImage && (
+            <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
+          )}
+        </View>
+      </ImageBackground>
+    </ScreenWithFooter>
   );
 };
 

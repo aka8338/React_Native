@@ -1,3 +1,90 @@
 {
-  "welcome": "Welcome to the App"
+  "welcome": "Welcome to the App",
+  "general": {
+    "home": "Home",
+    "identification": "Identification",
+    "profile": "Profile",
+    "sorghumDisease": "Sorghum Disease",
+    "search": "Search",
+    "submit": "Submit",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading..."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "login": "Log in"
+  },
+  "otp": {
+    "verification": "Verification",
+    "enterCode": "Enter Code",
+    "sentCode": "Code sent to",
+    "resend": "Resend",
+    "verify": "Verify"
+  },
+  "weather": {
+    "weatherReport": "Weather Report",
+    "temperature": "Temperature",
+    "condition": "Condition",
+    "location": "Location",
+    "enterLocation": "Enter location"
+  },
+  "identification": {
+    "touchToIdentify": "Touch to identify",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "takePhoto": "Take Photo",
+    "selectPhoto": "Select Photo",
+    "analyzing": "Analyzing disease...",
+    "results": "Results"
+  },
+  "profile": {
+    "myProfile": "My Profile",
+    "editProfile": "Edit Profile",
+    "settings": "Settings",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "notifications": "Notifications",
+    "about": "About",
+    "logout": "Logout",
+    "help": "Help",
+    "languageLabel": "Language:",
+    "english": "EN",
+    "amharic": "AMH",
+    "oromo": "OR"
+  },
+  "diseases": {
+    "anthracnose": "Anthracnose",
+    "leafBlight": "Leaf Blight",
+    "rustDisease": "Rust Disease",
+    "smut": "Smut",
+    "downyMildew": "Downy Mildew",
+    "healthy": "Healthy",
+    "learnMore": "Learn More",
+    "preventionTips": "Prevention Tips"
+  },
+  "splash": {
+    "welcome": "Welcome to the Sorghum Disease Identifier App!",
+    "identifyText": "Capture or upload an image of your sorghum crop to detect diseases and receive treatment advice.",
+    "healthCheck": "Health Check",
+    "helpText": "This app helps you identify diseases in sorghum plants.",
+    "careText": "Learn how to take proper care of your crops.",
+    "adviceText": "Receive farming advice about how to improve your yield",
+    "cultivationTips": "Cultivation Tips",
+    "next": "Next",
+    "back": "Back"
+  }
 }

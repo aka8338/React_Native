@@ -1,0 +1,90 @@
+{
+  "welcome": "Appitti dhuftan",
+  "general": {
+    "home": "Fuula Jalqabaa",
+    "identification": "Addaan Baasuu",
+    "profile": "Profaayilii",
+    "sorghumDisease": "Dhukkuba Mishinga",
+    "search": "Barbaadi",
+    "submit": "Galchi",
+    "continue": "Itti Fufi",
+    "cancel": "Haqi",
+    "save": "Olkaa'i",
+    "delete": "Balleessi",
+    "loading": "Fe'ama jira..."
+  },
+  "auth": {
+    "signIn": "Seeni",
+    "signUp": "Galmaa'i",
+    "signOut": "Ba'i",
+    "email": "Imeelii",
+    "password": "Jecha Iccitii",
+    "confirmPassword": "Jecha Iccitii Mirkaneessi",
+    "forgotPassword": "Jecha Iccitii Irraanfatte?",
+    "name": "Maqaa Guutuu",
+    "phone": "Lakkoofsa Bilbilaa",
+    "createAccount": "Akkaawuntii Haaraa Uumi",
+    "alreadyHaveAccount": "Akkaawuntii qabdaa?",
+    "dontHaveAccount": "Akkaawuntii hin qabduu?",
+    "login": "Seeni"
+  },
+  "otp": {
+    "verification": "Mirkaneessa",
+    "enterCode": "Koodii Galchi",
+    "sentCode": "Koodiin ergame gara",
+    "resend": "Irra Deebi'i Ergi",
+    "verify": "Mirkaneessi"
+  },
+  "weather": {
+    "weatherReport": "Gabaasa Haala Qilleensaa",
+    "temperature": "Ho'ina",
+    "condition": "Haala",
+    "location": "Bakka",
+    "enterLocation": "Bakka galchi"
+  },
+  "identification": {
+    "touchToIdentify": "Addaan baasuf tuqi",
+    "camera": "Kaameeraa",
+    "gallery": "Gaalarii",
+    "takePhoto": "Suuraa Kaasi",
+    "selectPhoto": "Suuraa Filadhu",
+    "analyzing": "Dhukkuba addaan baasaa jira...",
+    "results": "Bu'aa"
+  },
+  "profile": {
+    "myProfile": "Profaayilii Koo",
+    "editProfile": "Profaayilii Gulaali",
+    "settings": "Qindaa'ina",
+    "language": "Afaan",
+    "darkMode": "Moodi Dukkana",
+    "notifications": "Beeksisawwan",
+    "about": "Waa'ee",
+    "logout": "Ba'i",
+    "help": "Gargaarsa",
+    "languageLabel": "Afaan:",
+    "english": "EN",
+    "amharic": "አማርኛ",
+    "oromo": "Afaan Oromoo"
+  },
+  "diseases": {
+    "anthracnose": "Antiraaknoozii",
+    "leafBlight": "Balaayitii Baala",
+    "rustDisease": "Dhukkuba Raastii",
+    "smut": "Simaatii",
+    "downyMildew": "Dawunii Miildiiwii",
+    "healthy": "Fayyaa",
+    "learnMore": "Dabalata Baradhu",
+    "preventionTips": "Gorsa Ittisa"
+  },
+  "splash": {
+    "welcome": "Appii Addaan Baasuu Dhukkuba Mishingaa dhuftan!",
+    "identifyText": "Suuraa midhaan mishingaa kee kaasii ykn galchii dhukkubaa addaan baasii gorsa yaalaa argadhu.",
+    "healthCheck": "Qorannoo Fayyaa",
+    "helpText": "Appiin kun dhukkuboota biqiltuu mishingaa keessatti argaman addaan baasuu si gargaara.",
+    "careText": "Akkaataa kunuunsa sirrii midhaan keetti gochuuf baraa.",
+    "adviceText": "Gorsa qonnaa kan akka galii kee fooyyessuuf gargaaru argadhu",
+    "cultivationTips": "Gorsa Misoomsuu",
+    "next": "Itti Aanee",
+    "back": "Duubatti"
+  }
+} 

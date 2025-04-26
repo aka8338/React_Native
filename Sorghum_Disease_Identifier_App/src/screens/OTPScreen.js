@@ -8,8 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const OTPScreen = ({ route, navigation }) => {
+  const { t } = useTranslation();
   const { formData } = route.params;
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(30);
@@ -66,10 +68,10 @@ const OTPScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <MaterialIcons name="verified-user" size={50} color="#148F55" />
-      <Text style={styles.title}>OTP Verification</Text>
+      <Text style={styles.title}>{t("otp.verification")}</Text>
       <Text style={styles.subtitle}>
-        Enter the verification code we sent to{"\n"}
-        {formData.phoneNumber}
+        {t("otp.enterCode")}{"\n"}
+        {t("otp.sentCode")} {formData.phoneNumber}
       </Text>
 
       <View style={styles.otpContainer}>
@@ -97,12 +99,12 @@ const OTPScreen = ({ route, navigation }) => {
             timer > 0 && styles.resendButtonTextDisabled,
           ]}
         >
-          Resend OTP {timer > 0 ? `(${timer}s)` : ""}
+          {t("otp.resend")} {timer > 0 ? `(${timer}s)` : ""}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.verifyButton} onPress={handleVerifyOTP}>
-        <Text style={styles.verifyButtonText}>Verify & Continue</Text>
+        <Text style={styles.verifyButtonText}>{t("otp.verify")} & {t("general.continue")}</Text>
       </TouchableOpacity>
     </View>
   );

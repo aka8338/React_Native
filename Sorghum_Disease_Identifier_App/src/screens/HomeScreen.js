@@ -1,17 +1,25 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import Footer from "../components/Footer";
 import WeatherReport from "../components/TemperatureDisplay";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
+import ScreenWithFooter from "../components/ScreenWithFooter";
 
 const HomeScreen = ({ navigation }) => {
+  const { t } = useTranslation();
+  
   return (
-    <View style={styles.container}>
-      {/* Weather report is now at the top */}
-      <WeatherReport />
-
-      {/* Footer at the bottom */}
-      <Footer navigation={navigation} />
-    </View>
+    <ScreenWithFooter navigation={navigation}>
+      <View style={styles.container}>
+        {/* Language switcher in the top right corner */}
+        <View style={styles.languageSwitcherContainer}>
+          <LanguageSwitcher />
+        </View>
+        
+        {/* Weather report */}
+        <WeatherReport />
+      </View>
+    </ScreenWithFooter>
   );
 };
 
@@ -20,6 +28,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "flex-start", // Start content from the top
+  },
+  languageSwitcherContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10, // Ensure it's above other elements
   },
   heading: {
     fontSize: 20,

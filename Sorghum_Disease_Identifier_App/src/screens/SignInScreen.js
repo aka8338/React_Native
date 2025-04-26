@@ -10,8 +10,10 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const SignInScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -45,25 +47,25 @@ const SignInScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={styles.title}>Welcome Back!</Text>
-        <Text style={styles.subtitle}>Sign in to continue</Text>
+        <Text style={styles.title}>{t("auth.signIn")}</Text>
+        <Text style={styles.subtitle}>{t("auth.signIn")} {t("general.continue").toLowerCase()}</Text>
 
         <View style={styles.formContainer}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t("auth.email")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your email"
+            placeholder={t("auth.email")}
             keyboardType="email-address"
             autoCapitalize="none"
             value={formData.email}
             onChangeText={(text) => setFormData({ ...formData, email: text })}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>{t("auth.password")}</Text>
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.passwordInput}
-              placeholder="Enter your password"
+              placeholder={t("auth.password")}
               secureTextEntry={!showPassword}
               value={formData.password}
               onChangeText={(text) => setFormData({ ...formData, password: text })}
@@ -81,22 +83,22 @@ const SignInScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            <Text style={styles.forgotPasswordText}>{t("auth.forgotPassword")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.signInButton} 
             onPress={handleSignIn}
           >
-            <Text style={styles.signInButtonText}>Sign in</Text>
+            <Text style={styles.signInButtonText}>{t("auth.signIn")}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.signUpText}>Don't have an account? </Text>
+        <Text style={styles.signUpText}>{t("auth.dontHaveAccount")} </Text>
         <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-          <Text style={styles.signUpLink}>Sign up</Text>
+          <Text style={styles.signUpLink}>{t("auth.signUp")}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -199,23 +201,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 15,
-    borderTopWidth: 0.5,
-    borderTopColor: '#ddd',
-    backgroundColor: '#fff',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
   signUpText: {
     color: "#666",
-    fontSize: 15,
+    fontSize: 14,
   },
   signUpLink: {
     color: "#148F55",
-    fontSize: 15,
-    fontWeight: "500",
-    marginLeft: 4,
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });
 

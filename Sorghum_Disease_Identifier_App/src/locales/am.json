@@ -1,3 +1,90 @@
 {
-  "welcome": "እንኳን ወደ አፕ መጡ"
+  "welcome": "እንኳን ወደ አፕ መጡ",
+  "general": {
+    "home": "ዋና ገጽ",
+    "identification": "መለየት",
+    "profile": "ግለ-ታሪክ",
+    "sorghumDisease": "የጽድ በሽታ",
+    "search": "ፈልግ",
+    "submit": "አስገባ",
+    "continue": "ቀጥል",
+    "cancel": "ሰርዝ",
+    "save": "አስቀምጥ",
+    "delete": "አጥፋ",
+    "loading": "በመጫን ላይ..."
+  },
+  "auth": {
+    "signIn": "ግባ",
+    "signUp": "ተመዝገብ",
+    "signOut": "ውጣ",
+    "email": "ኢሜይል",
+    "password": "የይለፍ ቃል",
+    "confirmPassword": "የይለፍ ቃል አረጋግጥ",
+    "forgotPassword": "የይለፍ ቃልን ረሳኽው?",
+    "name": "ሙሉ ስም",
+    "phone": "ስልክ ቁጥር",
+    "createAccount": "አዲስ አካውንት ፍጠር",
+    "alreadyHaveAccount": "አካውንት አለዎት?",
+    "dontHaveAccount": "አካውንት የለዎትም?",
+    "login": "ግባ"
+  },
+  "otp": {
+    "verification": "ማረጋገጫ",
+    "enterCode": "ኮድዎን ያስገቡ",
+    "sentCode": "ኮድ ተልኳል ወደ",
+    "resend": "እንደገና ላክ",
+    "verify": "አረጋግጥ"
+  },
+  "weather": {
+    "weatherReport": "የአየር ሁኔታ ሪፖርት",
+    "temperature": "የሙቀት መጠን",
+    "condition": "ሁኔታ",
+    "location": "አካባቢ",
+    "enterLocation": "አካባቢን ያስገቡ"
+  },
+  "identification": {
+    "touchToIdentify": "ለመለየት ይንኩ",
+    "camera": "ካሜራ",
+    "gallery": "ጋለሪ",
+    "takePhoto": "ፎቶ ያንሱ",
+    "selectPhoto": "ፎቶ ይምረጡ",
+    "analyzing": "በሽታውን በመለየት ላይ...",
+    "results": "ውጤቶች"
+  },
+  "profile": {
+    "myProfile": "የኔ ግለ-ታሪክ",
+    "editProfile": "ግለ-ታሪክ አስተካክል",
+    "settings": "ቅንብሮች",
+    "language": "ቋንቋ",
+    "darkMode": "ጨለማ ሁነታ",
+    "notifications": "ማሳወቂያዎች",
+    "about": "ስለ አፕሊኬሽኑ",
+    "logout": "ውጣ",
+    "help": "እገዛ",
+    "languageLabel": "ቋንቋ:",
+    "english": "EN",
+    "amharic": "አማርኛ",
+    "oromo": "ኦሮምኛ"
+  },
+  "diseases": {
+    "anthracnose": "አንትራክኖዝ",
+    "leafBlight": "የቅጠል ብላይት",
+    "rustDisease": "ዝገት በሽታ",
+    "smut": "ስመት",
+    "downyMildew": "ዳውኒ ሚልዲው",
+    "healthy": "ጤናማ",
+    "learnMore": "ተጨማሪ ይወቁ",
+    "preventionTips": "የመከላከያ ምክሮች"
+  },
+  "splash": {
+    "welcome": "እንኳን ወደ የጽድ በሽታ መለያ መተግበሪያ በደህና መጡ!",
+    "identifyText": "የጽድ ሰብልዎን ፎቶ በማንሳት ወይም በመጫን በሽታዎችን ይለዩ እና የህክምና ምክር ያግኙ።",
+    "healthCheck": "የጤና ምርመራ",
+    "helpText": "ይህ መተግበሪያ በጽድ ተክሎች ውስጥ ያሉ በሽታዎችን እንዲለዩ ይረዳዎታል።",
+    "careText": "እንዴት ሰብልዎን በአግባቡ እንደሚንከባከቡ ይማሩ።",
+    "adviceText": "ምርትዎን እንዴት እንደሚያሻሽሉ የእርሻ ምክሮችን ያግኙ",
+    "cultivationTips": "የአመራረት ምክሮች",
+    "next": "ቀጣይ",
+    "back": "ተመለስ"
+  }
 }

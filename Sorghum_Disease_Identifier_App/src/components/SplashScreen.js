@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Animated,
   Image,
@@ -6,33 +6,45 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
+  FlatList,
 } from "react-native";
+import { useTranslation } from "react-i18next";
+import { changeLanguage } from "../i18n";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const SplashScreen = ({ navigation }) => {
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
   const [colorAnim] = useState(new Animated.Value(0));
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+  const languages = [
+    { code: 'en', name: 'English', localName: 'English' },
+    { code: 'am', name: 'Amharic', localName: 'አማርኛ' },
+    { code: 'or', name: 'Oromo', localName: 'Afaan Oromoo' }
+  ];
 
   const pages = [
     {
       image: require("../assets/welcome1.png"),
-      text: "Welcome to the Sorghum Disease Identifier App!",
-      subText:
-        "Capture or upload an image of your sorghum crop to detect diseases and receive treatment advice.",
-      caption: "Health Check",
+      text: t("splash.welcome"),
+      subText: t("splash.identifyText"),
+      caption: t("splash.healthCheck"),
     },
     {
       image: require("../assets/welcome2.png"),
-      text: "This app helps you identify diseases in sorghum plants.",
-      subText: "Learn how to take proper care of your crops.",
+      text: t("splash.helpText"),
+      subText: t("splash.careText"),
       caption: "",
     },
     {
       image: require("../assets/welcome3.png"),
       text: "",
-      subText: "Receive farming advice about how to improve your yield",
-      caption: " Cultivation Tips",
+      subText: t("splash.adviceText"),
+      caption: t("splash.cultivationTips"),
     },
   ];
 
@@ -47,6 +59,11 @@ const SplashScreen = ({ navigation }) => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const handleLanguageChange = (langCode) => {
+    changeLanguage(langCode);
+    setShowLanguageModal(false);
   };
 
   useEffect(() => {
@@ -87,8 +104,56 @@ const SplashScreen = ({ navigation }) => {
     outputRange: ["#FFD700", "#006400"],
   });
 
+  const renderLanguageItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.languageItem}
+      onPress={() => handleLanguageChange(item.code)}
+    >
+      <Text style={[styles.languageItemText, i18n.language === item.code && styles.selectedLanguageText]}>
+        {item.localName}
+      </Text>
+      {i18n.language === item.code && (
+        <MaterialIcons name="check" size={18} color="#148F55" />
+      )}
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
+      {/* Language Switcher */}
+      <TouchableOpacity 
+        style={styles.languageButton} 
+        onPress={() => setShowLanguageModal(true)}
+      >
+        <MaterialIcons name="language" size={24} color="#148F55" />
+        <Text style={styles.languageButtonText}>
+          {languages.find(lang => lang.code === i18n.language)?.localName || 'Language'}
+        </Text>
+        <MaterialIcons name="arrow-drop-down" size={24} color="#148F55" />
+      </TouchableOpacity>
+
+      {/* Language Selection Modal */}
+      <Modal
+        transparent={true}
+        visible={showLanguageModal}
+        animationType="fade"
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowLanguageModal(false)}
+        >
+          <View style={styles.languageModalContainer}>
+            <FlatList
+              data={languages}
+              renderItem={renderLanguageItem}
+              keyExtractor={(item) => item.code}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       <Animated.Text
         style={[styles.text, { opacity: fadeAnim, color: textColor }]}
       >
@@ -108,14 +173,14 @@ const SplashScreen = ({ navigation }) => {
             style={styles.signUpButton}
             onPress={() => navigation.navigate("SignUp")}
           >
-            <Text style={styles.signUpText}>Sign up</Text>
+            <Text style={styles.signUpText}>{t("auth.signUp")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.loginButton}
             onPress={() => navigation.navigate("Signin")}
           >
-            <Text style={styles.loginText}>Log in</Text>
+            <Text style={styles.loginText}>{t("auth.login")}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -123,7 +188,7 @@ const SplashScreen = ({ navigation }) => {
 <View style={styles.footer}>
         {currentPage > 0 && (
           <TouchableOpacity onPress={handleBack}>
-            <Text style={styles.navigationText}>{"<"}</Text>
+            <Text style={styles.navigationText}>{t("splash.back")}</Text>
           </TouchableOpacity>
         )}
         {currentPage === 0 && <View style={{ width: 28 }} />}
@@ -144,7 +209,7 @@ const SplashScreen = ({ navigation }) => {
 
         {currentPage < pages.length - 1 && (
           <TouchableOpacity onPress={handleNext}>
-            <Text style={styles.navigationText}>{">"}</Text>
+            <Text style={styles.navigationText}>{t("splash.next")}</Text>
           </TouchableOpacity>
         )}
         {currentPage === pages.length - 1 && <View style={{ width: 28 }} />}
@@ -160,6 +225,61 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#ffffff",
     paddingHorizontal: 20,
+  },
+  languageButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+  languageButtonText: {
+    color: '#148F55',
+    marginLeft: 5,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  languageModalContainer: {
+    position: 'absolute',
+    top: 90,
+    right: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  languageItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    minWidth: 150,
+  },
+  languageItemText: {
+    fontSize: 16,
+    color: '#333',
+    marginRight: 10,
+  },
+  selectedLanguageText: {
+    color: '#148F55',
+    fontWeight: 'bold',
   },
   text: {
     textAlign: "center",
@@ -199,52 +319,53 @@ const styles = StyleSheet.create({
     width: "80%",
     paddingVertical: 12,
     backgroundColor: "#148F55",
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   signUpText: {
     color: "#ffffff",
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "bold",
   },
   loginButton: {
     width: "80%",
     paddingVertical: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
     borderColor: "#148F55",
-    borderWidth: 2,
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: "center",
   },
   loginText: {
     color: "#148F55",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
   footer: {
-    position: "absolute",
-    bottom: 30,
-    left: 0,
-    right: 0,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
-  },
-  navigationText: {
-    fontSize: 28,
-    color: "#000",
-    marginHorizontal: 20,
-  },
-  pageDot: {
-    fontSize: 30,
-    marginHorizontal: 5,
-    color: "#d3d3d3",
-  },
-  activeDot: {
-    color: "#000",
+    width: "100%",
+    position: "absolute",
+    bottom: 20,
+    paddingHorizontal: 20,
   },
   pageIndicatorContainer: {
     flexDirection: "row",
-    alignItems: "center",
+  },
+  pageDot: {
+    fontSize: 30,
+    color: "#D3D3D3",
+    marginHorizontal: 5,
+  },
+  activeDot: {
+    color: "#148F55",
+  },
+  navigationText: {
+    fontSize: 16,
+    color: "#148F55",
+    fontWeight: "bold",
   },
 });
 

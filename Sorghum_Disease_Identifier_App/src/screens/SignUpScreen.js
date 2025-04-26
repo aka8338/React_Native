@@ -10,8 +10,10 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const SignUpScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: "",
     phoneNumber: "",
@@ -48,11 +50,11 @@ const SignUpScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={styles.title}>Sign up</Text>
-        <Text style={styles.subtitle}>Create a new account to continue</Text>
+        <Text style={styles.title}>{t("auth.signUp")}</Text>
+        <Text style={styles.subtitle}>{t("auth.createAccount")}</Text>
 
         <View style={styles.formContainer}>
-          <Text style={styles.label}>Enter your email Id</Text>
+          <Text style={styles.label}>{t("auth.email")}</Text>
           <TextInput
             style={styles.input}
             placeholder="mailtoexample@gmail.com"
@@ -62,7 +64,7 @@ const SignUpScreen = ({ navigation }) => {
             onChangeText={(text) => setFormData({ ...formData, email: text })}
           />
 
-          <Text style={styles.label}>Enter your phone number</Text>
+          <Text style={styles.label}>{t("auth.phone")}</Text>
           <View style={styles.phoneInputContainer}>
             <Text style={styles.countryCode}>+91</Text>
             <TextInput
@@ -93,15 +95,15 @@ const SignUpScreen = ({ navigation }) => {
             onPress={handleSignUp}
             disabled={!isChecked}
           >
-            <Text style={styles.signUpButtonText}>Sign up</Text>
+            <Text style={styles.signUpButtonText}>{t("auth.signUp")}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.loginText}>Already have an Account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.loginLink}>Log in</Text>
+        <Text style={styles.loginText}>{t("auth.alreadyHaveAccount")} </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Signin")}>
+          <Text style={styles.loginLink}>{t("auth.login")}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -200,37 +202,36 @@ const styles = StyleSheet.create({
   },
   termsLink: {
     color: "#148F55",
+    fontWeight: "bold",
   },
   signUpButton: {
     backgroundColor: "#148F55",
-    padding: 15,
     borderRadius: 8,
+    paddingVertical: 12,
     alignItems: "center",
   },
   signUpButtonDisabled: {
-    backgroundColor: "#ccc",
+    backgroundColor: "#8BC34A",
   },
   signUpButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "bold",
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
   },
   loginText: {
     color: "#666",
-    fontSize: 16,
+    fontSize: 14,
   },
   loginLink: {
     color: "#148F55",
-    fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "bold",
+    fontSize: 14,
   },
 });
 

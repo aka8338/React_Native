@@ -10,10 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const API_KEY = "7a6b1217f4134a526ee5bca3e084348b"; // Replace with your OpenWeatherMap API key
 
 const WeatherReport = () => {
+  const { t } = useTranslation();
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -116,7 +118,7 @@ const WeatherReport = () => {
       blurRadius={2}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Weather Report</Text>
+        <Text style={styles.title}>{t("weather.weatherReport")}</Text>
 
         {loading ? (
           <ActivityIndicator size="large" color="#148F55" />
@@ -142,7 +144,7 @@ const WeatherReport = () => {
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Enter location"
+            placeholder={t("weather.enterLocation")}
             value={locationInput}
             onChangeText={setLocationInput}
           />
@@ -150,7 +152,7 @@ const WeatherReport = () => {
             style={styles.searchButton}
             onPress={handleLocationChange}
           >
-            <Text style={styles.searchButtonText}>Search</Text>
+            <Text style={styles.searchButtonText}>{t("general.search")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -199,12 +201,12 @@ const styles = StyleSheet.create({
   temperature: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#000",
+    color: "#148F55",
+    marginVertical: 5,
   },
   condition: {
     fontSize: 16,
-    color: "#555",
-    marginTop: 5,
+    color: "#666",
   },
   weatherIcon: {
     marginLeft: 10,
@@ -212,27 +214,30 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     textAlign: "center",
+    marginBottom: 10,
   },
   searchContainer: {
     flexDirection: "row",
     marginTop: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 25,
+    overflow: "hidden",
   },
   searchInput: {
     flex: 1,
-    backgroundColor: "#fff",
     padding: 10,
-    borderRadius: 5,
-    marginRight: 10,
+    paddingLeft: 15,
+    fontSize: 16,
   },
   searchButton: {
     backgroundColor: "#148F55",
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     alignItems: "center",
+    justifyContent: "center",
   },
   searchButtonText: {
-    color: "#fff",
+    color: "white",
     fontWeight: "bold",
   },
 });

@@ -1,8 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 const Footer = ({ navigation }) => {
+  const { t } = useTranslation();
+  
   return (
     <View style={styles.footerContainer}>
       <View style={styles.footer}>
@@ -11,7 +14,7 @@ const Footer = ({ navigation }) => {
           onPress={() => navigation.navigate("Home")}
         >
           <MaterialIcons name="home" size={24} color="black" />
-          <Text style={styles.iconText}>Home</Text>
+          <Text style={styles.iconText}>{t("general.home")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -19,7 +22,7 @@ const Footer = ({ navigation }) => {
           onPress={() => navigation.navigate("Identification")}
         >
           <MaterialIcons name="camera-alt" size={24} color="black" />
-          <Text style={styles.iconText}>Identification</Text>
+          <Text style={styles.iconText}>{t("general.identification")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -27,14 +30,14 @@ const Footer = ({ navigation }) => {
           onPress={() => navigation.navigate("Sorghum Disease")}
         >
           <MaterialIcons name="coronavirus" size={24} color="black" />
-          <Text style={styles.iconText}>Sorghum Disease</Text>
+          <Text style={styles.iconText}>{t("general.sorghumDisease")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconContainer}
           onPress={() => navigation.navigate("Profile")}
         >
           <MaterialIcons name="person" size={24} color="black" />
-          <Text style={styles.iconText}>Profile</Text>
+          <Text style={styles.iconText}>{t("general.profile")}</Text>
         </TouchableOpacity>
       </View>
     </View>
