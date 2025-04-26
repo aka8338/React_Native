@@ -4,7 +4,7 @@
     "home": "Fuula Jalqabaa",
     "identification": "Addaan Baasuu",
     "profile": "Profaayilii",
-    "sorghumDisease": "Dhukkuba Mishinga",
+    "mangoDisease": "Dhibee Maangoo",
     "search": "Barbaadi",
     "submit": "Galchi",
     "continue": "Itti Fufi",
@@ -77,10 +77,10 @@
     "preventionTips": "Gorsa Ittisa"
   },
   "splash": {
-    "welcome": "Appii Addaan Baasuu Dhukkuba Mishingaa dhuftan!",
-    "identifyText": "Suuraa midhaan mishingaa kee kaasii ykn galchii dhukkubaa addaan baasii gorsa yaalaa argadhu.",
+    "welcome": "Appii Adda Baasaa Dhibeewwan Maangoo dhaan baga nagaan dhuftan!",
+    "identifyText": "Fakkii midhaan maangoo keessanii kaasaa ykn galmeeysaa dhibeewwan adda baafachuuf, gorsa yaala argachuufis.",
     "healthCheck": "Qorannoo Fayyaa",
-    "helpText": "Appiin kun dhukkuboota biqiltuu mishingaa keessatti argaman addaan baasuu si gargaara.",
+    "helpText": "Aplikeeshiniin kun dhibeewwan biqiltuu maangoo keessatti argaman adda baafachuu isin gargaara.",
     "careText": "Akkaataa kunuunsa sirrii midhaan keetti gochuuf baraa.",
     "adviceText": "Gorsa qonnaa kan akka galii kee fooyyessuuf gargaaru argadhu",
     "cultivationTips": "Gorsa Misoomsuu",

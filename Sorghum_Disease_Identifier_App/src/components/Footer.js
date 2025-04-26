@@ -27,10 +27,10 @@ const Footer = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.iconContainer}
-          onPress={() => navigation.navigate("Sorghum Disease")}
+          onPress={() => navigation.navigate("Mango Disease")}
         >
           <MaterialIcons name="coronavirus" size={24} color="black" />
-          <Text style={styles.iconText}>{t("general.sorghumDisease")}</Text>
+          <Text style={styles.iconText}>{t("general.mangoDisease")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconContainer}

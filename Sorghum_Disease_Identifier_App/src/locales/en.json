@@ -4,7 +4,7 @@
     "home": "Home",
     "identification": "Identification",
     "profile": "Profile",
-    "sorghumDisease": "Sorghum Disease",
+    "mangoDisease": "Mango Disease",
     "search": "Search",
     "submit": "Submit",
     "continue": "Continue",
@@ -77,10 +77,10 @@
     "preventionTips": "Prevention Tips"
   },
   "splash": {
-    "welcome": "Welcome to the Sorghum Disease Identifier App!",
-    "identifyText": "Capture or upload an image of your sorghum crop to detect diseases and receive treatment advice.",
+    "welcome": "Welcome to the Mango Disease Identifier App!",
+    "identifyText": "Capture or upload an image of your mango crop to detect diseases and receive treatment advice.",
     "healthCheck": "Health Check",
-    "helpText": "This app helps you identify diseases in sorghum plants.",
+    "helpText": "This app helps you identify diseases in mango plants.",
     "careText": "Learn how to take proper care of your crops.",
     "adviceText": "Receive farming advice about how to improve your yield",
     "cultivationTips": "Cultivation Tips",
