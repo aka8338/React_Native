@@ -24,7 +24,8 @@ const SplashScreen = ({ navigation }) => {
   const languages = [
     { code: 'en', name: 'English', localName: 'English' },
     { code: 'am', name: 'Amharic', localName: 'አማርኛ' },
-    { code: 'or', name: 'Oromo', localName: 'Afaan Oromoo' }
+    { code: 'or', name: 'Oromo', localName: 'Afaan Oromoo' },
+    { code: 'ti', name: 'Tigrinya', localName: 'ትግርኛ' }
   ];
 
   const pages = [

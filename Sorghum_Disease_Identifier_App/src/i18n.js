@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import am from "./locales/am.json";
 import or from "./locales/or.json";
+import ti from "./locales/ti.json";
 import { I18nManager } from "react-native";
 
 i18n.use(initReactI18next).init({
@@ -15,6 +16,9 @@ i18n.use(initReactI18next).init({
     },
     or: {
       translation: or
+    },
+    ti: {
+      translation: ti
     }
   },
   lng: "am", // Changed default language to Amharic

@@ -23,7 +23,8 @@ const LanguageSwitcher = () => {
   const languages = [
     { code: "en", name: "English", nativeName: "English" },
     { code: "am", name: "Amharic", nativeName: "አማርኛ" },
-    { code: "or", name: "Oromo", nativeName: "Afaan Oromoo" }
+    { code: "or", name: "Oromo", nativeName: "Afaan Oromoo" },
+    { code: "ti", name: "Tigrinya", nativeName: "ትግርኛ" }
   ];
 
   const handleLanguageChange = (languageCode) => {
@@ -37,6 +38,7 @@ const LanguageSwitcher = () => {
       case 'en': return 'English';
       case 'am': return 'አማርኛ';
       case 'or': return 'Oromoo';
+      case 'ti': return 'ትግርኛ';
       default: return code.toUpperCase();
     }
   };

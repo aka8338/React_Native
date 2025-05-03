@@ -2,6 +2,11 @@
 
 # dependencies
 node_modules/
+node_modules/**/*
+**/node_modules/
+npm-packages-offline-cache/
+package-lock.json
+yarn.lock
 
 # Expo
 .expo/
@@ -30,7 +35,40 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+.env*
+!.env.example
 
 # typescript
 *.tsbuildinfo
+
+# iOS
+ios/build/
+ios/Pods/
+ios/Podfile.lock
+ios/*.xcworkspace
+ios/*.xcodeproj
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/app/release/
+
+# logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jest
+coverage/
+
+# large files
+*.hprof
