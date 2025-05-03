@@ -186,15 +186,15 @@ const IdentificationScreen = ({ navigation }) => {
                   <Text style={styles.treatmentTitle}>{t("diseases.treatment")}</Text>
                   <View style={styles.treatmentItem}>
                     <MaterialIcons name="check-circle" size={20} color="#148F55" />
-                    <Text style={styles.treatmentText}>Apply fungicides during flowering period</Text>
+                    <Text style={styles.treatmentText}>{t("identification.treatment1")}</Text>
                   </View>
                   <View style={styles.treatmentItem}>
                     <MaterialIcons name="check-circle" size={20} color="#148F55" />
-                    <Text style={styles.treatmentText}>Prune infected branches and leaves</Text>
+                    <Text style={styles.treatmentText}>{t("identification.treatment2")}</Text>
                   </View>
                   <View style={styles.treatmentItem}>
                     <MaterialIcons name="check-circle" size={20} color="#148F55" />
-                    <Text style={styles.treatmentText}>Maintain proper tree spacing</Text>
+                    <Text style={styles.treatmentText}>{t("identification.treatment3")}</Text>
                   </View>
                 </View>
 

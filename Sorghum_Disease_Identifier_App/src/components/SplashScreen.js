@@ -8,6 +8,7 @@ import {
   View,
   Modal,
   FlatList,
+  Platform
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { changeLanguage } from "../i18n";
@@ -98,6 +99,13 @@ const SplashScreen = ({ navigation }) => {
     }).start();
   }, [currentPage]);
 
+  useEffect(() => {
+    return () => {
+      // Ensure modal is closed when component unmounts
+      setShowLanguageModal(false);
+    };
+  }, []);
+
   const words = pages[currentPage].text.split(" ");
 
   const textColor = colorAnim.interpolate({
@@ -133,27 +141,29 @@ const SplashScreen = ({ navigation }) => {
         <MaterialIcons name="arrow-drop-down" size={24} color="#148F55" />
       </TouchableOpacity>
 
-      {/* Language Selection Modal */}
-      <Modal
-        transparent={true}
-        visible={showLanguageModal}
-        animationType="fade"
-        onRequestClose={() => setShowLanguageModal(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowLanguageModal(false)}
+      {/* Language Selection Modal - only show when modal is visible to avoid DOM issues */}
+      {showLanguageModal && (
+        <Modal
+          transparent={true}
+          visible={showLanguageModal}
+          animationType="fade"
+          onRequestClose={() => setShowLanguageModal(false)}
         >
-          <View style={styles.languageModalContainer}>
-            <FlatList
-              data={languages}
-              renderItem={renderLanguageItem}
-              keyExtractor={(item) => item.code}
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowLanguageModal(false)}
+          >
+            <View style={styles.languageModalContainer}>
+              <FlatList
+                data={languages}
+                renderItem={renderLanguageItem}
+                keyExtractor={(item) => item.code}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
 
       <Animated.Text
         style={[styles.text, { opacity: fadeAnim, color: textColor }]}
@@ -161,7 +171,7 @@ const SplashScreen = ({ navigation }) => {
         {words.slice(0, wordIndex).join(" ")}
       </Animated.Text>
 
-      <Image source={pages[currentPage].image} style={styles.image} />
+      <Image source={pages[currentPage].image} style={styles.image} resizeMode="cover" />
 
       {/* Caption Below Image */}
       <Text style={styles.captionText}>{pages[currentPage].caption}</Text>
@@ -258,10 +268,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 5,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: '0px 2px 3.84px rgba(0, 0, 0, 0.25)',
   },
   languageItem: {
     paddingVertical: 12,
@@ -308,7 +315,6 @@ const styles = StyleSheet.create({
   image: {
     width: 300,
     height: 300,
-    resizeMode: "cover",
   },
   buttonContainer: {
     marginTop: 10,

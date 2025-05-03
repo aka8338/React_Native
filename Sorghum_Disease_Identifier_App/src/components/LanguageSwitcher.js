@@ -1,163 +1,154 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
   Modal,
-  TouchableWithoutFeedback,
-} from "react-native";
-import { useTranslation } from "react-i18next";
-import { changeLanguage } from "../i18n";
-import { MaterialIcons } from "@expo/vector-icons";
+  FlatList,
+  Platform
+} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { useLanguage, LANGUAGES } from '../contexts/LanguageContext';
 
-const LanguageSwitcher = () => {
+const LanguageSwitcher = ({ style }) => {
   const { t, i18n } = useTranslation();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const { language, changeLanguage, getLanguageLabel } = useLanguage();
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
 
+  // Add cleanup on component unmount to avoid DOM issues
   useEffect(() => {
-    setSelectedLanguage(i18n.language);
-  }, [i18n.language]);
+    return () => {
+      // Ensure modal is closed when component unmounts
+      setShowLanguageModal(false);
+    };
+  }, []);
 
   const languages = [
-    { code: "en", name: "English", nativeName: "English" },
-    { code: "am", name: "Amharic", nativeName: "አማርኛ" },
-    { code: "or", name: "Oromo", nativeName: "Afaan Oromoo" },
-    { code: "ti", name: "Tigrinya", nativeName: "ትግርኛ" }
+    { code: LANGUAGES.ENGLISH, name: 'English', localName: 'English' },
+    { code: LANGUAGES.AMHARIC, name: 'Amharic', localName: 'አማርኛ' },
+    { code: LANGUAGES.OROMO, name: 'Oromo', localName: 'Afaan Oromoo' },
+    { code: LANGUAGES.TIGRINYA, name: 'Tigrinya', localName: 'ትግርኛ' },
   ];
 
-  const handleLanguageChange = (languageCode) => {
-    changeLanguage(languageCode);
-    setSelectedLanguage(languageCode);
-    setModalVisible(false);
+  const handleLanguageChange = (langCode) => {
+    changeLanguage(langCode);
+    setShowLanguageModal(false);
   };
 
-  const getLanguageDisplay = (code) => {
-    switch(code) {
-      case 'en': return 'English';
-      case 'am': return 'አማርኛ';
-      case 'or': return 'Oromoo';
-      case 'ti': return 'ትግርኛ';
-      default: return code.toUpperCase();
-    }
-  };
+  const renderLanguageItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.languageItem}
+      onPress={() => handleLanguageChange(item.code)}
+    >
+      <Text
+        style={[
+          styles.languageItemText,
+          language === item.code && styles.selectedLanguageText,
+        ]}
+      >
+        {item.localName}
+      </Text>
+      {language === item.code && (
+        <MaterialIcons name="check" size={18} color="#148F55" />
+      )}
+    </TouchableOpacity>
+  );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => setModalVisible(true)}
+        style={styles.languageButton}
+        onPress={() => setShowLanguageModal(true)}
       >
-        <MaterialIcons name="language" size={20} color="#fff" />
-        <Text style={styles.buttonText}>
-          {getLanguageDisplay(selectedLanguage)}
+        <MaterialIcons name="language" size={20} color="#148F55" />
+        <Text style={styles.languageButtonText}>
+          {languages.find((lang) => lang.code === language)?.localName ||
+            t('profile.language')}
         </Text>
-        <MaterialIcons name="arrow-drop-down" size={20} color="#fff" />
+        <MaterialIcons name="arrow-drop-down" size={20} color="#148F55" />
       </TouchableOpacity>
 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.languageSelector}>
-                <Text style={styles.modalTitle}>{t("profile.language")}</Text>
-                {languages.map((language) => (
-                  <TouchableOpacity
-                    key={language.code}
-                    style={[
-                      styles.languageOption,
-                      selectedLanguage === language.code &&
-                        styles.selectedLanguage,
-                    ]}
-                    onPress={() => handleLanguageChange(language.code)}
-                  >
-                    <Text
-                      style={[
-                        styles.languageText,
-                        selectedLanguage === language.code &&
-                          styles.selectedLanguageText,
-                      ]}
-                    >
-                      {language.nativeName}
-                    </Text>
-                    {selectedLanguage === language.code && (
-                      <MaterialIcons
-                        name="check"
-                        size={20}
-                        color="#148F55"
-                      />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      {/* Only render Modal when it's visible */}
+      {showLanguageModal && (
+        <Modal
+          transparent={true}
+          visible={showLanguageModal}
+          animationType="fade"
+          onRequestClose={() => setShowLanguageModal(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowLanguageModal(false)}
+          >
+            <View style={styles.languageModalContainer}>
+              <FlatList
+                data={languages}
+                renderItem={renderLanguageItem}
+                keyExtractor={(item) => item.code}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    position: 'relative',
   },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#148F55",
-    paddingHorizontal: 12,
+  languageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,
   },
-  buttonText: {
-    color: "#fff",
-    marginHorizontal: 5,
-    fontWeight: "500",
+  languageButtonText: {
+    color: '#148F55',
+    marginLeft: 5,
+    marginRight: 2,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'flex-start',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
-  languageSelector: {
-    width: "80%",
-    backgroundColor: "#fff",
+  languageModalContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    padding: 5,
     elevation: 5,
+    boxShadow: '0px 2px 3.84px rgba(0, 0, 0, 0.25)',
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
+  languageItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    minWidth: 150,
   },
-  languageOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    marginVertical: 5,
-  },
-  selectedLanguage: {
-    backgroundColor: "#F0FFF4",
-  },
-  languageText: {
+  languageItemText: {
     fontSize: 16,
+    color: '#333',
+    marginRight: 10,
   },
   selectedLanguageText: {
-    color: "#148F55",
-    fontWeight: "bold",
+    color: '#148F55',
+    fontWeight: 'bold',
   },
 });
 

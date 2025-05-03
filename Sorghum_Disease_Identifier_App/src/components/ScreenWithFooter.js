@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Footer from './Footer';
+import OfflineIndicator from './OfflineIndicator';
 
 /**
- * A wrapper component that adds the footer navigation to any screen
+ * A wrapper component that adds the offline indicator to any screen
  * @param {Object} props.children - The screen content to display
  * @param {Object} props.navigation - The navigation object from the screen
  */
@@ -14,8 +14,8 @@ const ScreenWithFooter = ({ children, navigation }) => {
         {children}
       </View>
       
-      {/* Footer navigation that appears on all screens */}
-      <Footer navigation={navigation} />
+      {/* Offline status indicator */}
+      <OfflineIndicator />
     </View>
   );
 };
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingBottom: 70, // Add padding at the bottom to account for the footer
+    paddingBottom: 60, // Add padding at the bottom to account for the tab navigator
   },
 });
 

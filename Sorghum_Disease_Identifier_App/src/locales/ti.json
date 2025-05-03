@@ -43,6 +43,7 @@
     "enterLocation": "ቦታ የእቱ"
   },
   "identification": {
+    "identify": "ምልላይ",
     "touchToIdentify": "ንምልላይ የሃርም",
     "camera": "ካሜራ",
     "gallery": "ጋለሪ",
@@ -79,9 +80,28 @@
     "accountSettings": "ናይ ኣካውንት ቅጥዕታት",
     "preferences": "ዝተመረጹ",
     "locationServices": "ናይ ቦታ ኣገልግሎታት",
-    "privacyPolicy": "ናይ ውልቃዊ መረዳእታ ፖሊሲ"
+    "privacyPolicy": "ናይ ውልቃዊ መረዳእታ ፖሊሲ",
+    "clearStoredData": "ዝተዓቀበ ዳታ ምጽራይ",
+    "clearDataTitle": "ኩሉ ዝተዓቀበ ዳታ ምጽራይ",
+    "clearDataMessage": "እዚ ኩሉ ዝተዓቀበ መለለዪታት፣ ሪፖርትታትን ቅጥዕታትን ክሰርዝ እዩ። እዚ ተግባር ክመለስ ኣይክእልን እዩ።",
+    "clearData": "ዳታ ምጽራይ",
+    "dataCleared": "ኩሉ ዳታ ተጸሪዩ ኣሎ",
+    "offlineLogoutWarning": "ኦፍላይን ምውጻእ",
+    "offlineLogoutMessage": "ኣብዚ እዋን ኦፍላይን ኢኻ። ኣብ ኦፍላይን ኮይንካ ምውጻእ ዘይተዓቀበ ዳታ ክሰኣን ይኽእል እዩ።",
+    "logoutConfirmTitle": "ምውጻእ የረጋግጹ",
+    "logoutConfirmMessage": "ርግጸኛ ዲኻ ክትወጽእ ትደሊ? ዝዀነ ዘይተዓቀበ ዳታ ክጠፍእ እዩ።",
+    "activityHistory": "ታሪኽ ንጥፈታት",
+    "noActivityYet": "ክሳብ ሕጂ ንጥፈታት የለዉን",
+    "savedReports": "ዝተዓቀቡ ሪፖርትታት",
+    "noReportsYet": "ክሳብ ሕጂ ሪፖርትታት የለዉን",
+    "reports": "ሪፖርትታት",
+    "diseases": "ሕማማት",
+    "activities": "ንጥፈታት",
+    "analytics": "ትንተናታት",
+    "confirmLogout": "ምውጻእ የረጋግጹ"
   },
   "diseases": {
+    "diseases": "ሕማማት",
     "anthracnose": "ኣንትራክኖዝ",
     "powderyMildew": "ፓውደሪ ሚልድዩ",
     "blackSpot": "ጸሊም ነጥቢ",
@@ -101,12 +121,48 @@
     "confidence": "እምነት",
     "name": "ሽም ሕማም"
   },
+  "reports": {
+    "diseaseReports": "ሪፖርት ሕማማት",
+    "noReportsYet": "ክሳብ ሕጂ ሪፖርታት የለዉን",
+    "identifyDisease": "ሕማም ምልላይ",
+    "noDataToDisplay": "ንምርኣይ ዝኾነ ዳታ የለን",
+    "diseasesDistribution": "ምዝርጋሕ ሕማማት",
+    "totalReports": "ጠቕላላ ሪፖርታት",
+    "uniqueDiseases": "ፍሉያት ሕማማት"
+  },
+  "home": {
+    "welcome": "እንቋዕ ብደሓን መጻእኩም",
+    "mangoDiseaseFinder": "መለለዪ ሕማም ማንጎ",
+    "features": "ኣገልግሎታት",
+    "identifyDisease": "ሕማም ምልላይ",
+    "identifyDescription": "ፎቶ ንምንሳእ ወይ ምስሊ ንምጽዓን ንሕማማት ንምልላይ",
+    "diseaseLibrary": "ቤተመጻሕፍቲ ሕማማት",
+    "diseaseLibraryDescription": "ልሙዳት ሕማማት ማንጎን ሕክምናኦምን ምርኣይ",
+    "viewReports": "ሪፖርታት ምርኣይ",
+    "reportsDescription": "ሪፖርታት ሕማምኩምን ስታቲስቲክስን ምርኣይ",
+    "recentReports": "ናይ ቀረባ ሪፖርታት",
+    "seeAll": "ኩሉ ምርኣይ",
+    "noReportsYet": "ክሳብ ሕጂ ሪፖርታት የለዉን",
+    "createReport": "ሪፖርት ምፍጣር",
+    "tipsAndAdvice": "ምኽሪታትን ሓሳባትን",
+    "preventionTip": "ናይ ማንጎ ኣግራብኩም ብስሩዕ ቁረጹዎም ንኣየር ምንቅስቓስ ንምምሕያሽን ሓደጋ ሕማም ንምንካይን",
+    "wateringTip": "ናይ ማንጎ ኣግራብኩም ኣብ መሰረት ጐድንን ቅጥዕን ኣስትዩዎም ናይ ቆጽሊ ሕማማት ንምክልኻል"
+  },
   "offline": {
     "offlineMode": "ኦፍላይን ሞድ",
+    "online": "ኦንላይን",
     "savedItems": "ዝተዓቀቡ ነገራት",
     "syncWhenOnline": "ናብ መስመር እንተኣቲኻ ዳታ ክተሓዋወስ እዩ",
     "pendingUploads": "ዝጸንሑ ምጽዓናት",
-    "lastSynced": "ናይ መወዳእታ ምትሕውዋስ"
+    "lastSynced": "ናይ መወዳእታ ምትሕውዋስ",
+    "neverSynced": "ፈጺሙ ኣይተሓዋወሰን",
+    "syncNow": "ሕጂ የሓዋውስ",
+    "syncSuccessful": "ምትሕውዋስ ብዓወት ተፈጺሙ",
+    "syncFailed": "ምትሕውዋስ ኣይሰለጠን",
+    "connectionStatus": "ናይ ርክብ ኩነታት",
+    "dataUsage": "ናይ ዳታ ኣጠቓቕማ",
+    "offlineData": "ናይ ኦፍላይን ዳታ",
+    "cacheSize": "ናይ መኽዘን ዓቐን"
   },
   "reporting": {
     "reportDisease": "ሕማም ምሕባር",
@@ -136,5 +192,13 @@
     "cultivationTips": "ናይ ምልማዕ ሓሳባት",
     "next": "ቀጺሉ",
     "back": "ተመለስ"
+  },
+  "theme": {
+    "lightMode": "ብርሃን ሞድ",
+    "darkMode": "ጸልማት ሞድ",
+    "switchToLight": "ናብ ብርሃን ሞድ ቀይር",
+    "switchToDark": "ናብ ጸልማት ሞድ ቀይር",
+    "themeSettings": "ናይ ገጽታ ቅጥዕታት",
+    "systemDefault": "ናይ ስርዓት ነባሪ"
   }
 } 

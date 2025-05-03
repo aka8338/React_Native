@@ -1,183 +1,235 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Alert,
-  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  SafeAreaView,
+  Image,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../contexts/AuthContext";
 
 const SignInScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
+  const { login, resetPassword, isLoading } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [resetPasswordModalVisible, setResetPasswordModalVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
-  const handleSignIn = () => {
-    if (!formData.email || !formData.password) {
-      Alert.alert("Error", "Please fill in all fields");
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter your email and password");
       return;
     }
-    // TODO: Implement sign in logic
-    navigation.navigate("Home");
+    
+    const result = await login(email, password);
+    
+    if (!result.success) {
+      Alert.alert("Login Failed", result.error || "Invalid email or password");
+    }
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity 
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <MaterialIcons name="arrow-back" size={24} color="#148F55" />
-      </TouchableOpacity>
+  const handlePasswordReset = async () => {
+    if (!resetEmail) {
+      Alert.alert("Error", "Please enter your email address");
+      return;
+    }
+    
+    const result = await resetPassword(resetEmail);
+    
+    if (result.success) {
+      setResetPasswordModalVisible(false);
+      Alert.alert(
+        "Password Reset Sent", 
+        "We've sent a password reset link to your email. Please check your inbox."
+      );
+      setResetEmail("");
+    } else {
+      Alert.alert("Password Reset Failed", "Unable to send reset email. Please try again later.");
+    }
+  };
 
-      <View style={styles.contentContainer}>
-        <View style={styles.imageContainer}>
-          <Image 
-            source={require('../assets/signin1.jpg')} 
-            style={styles.image}
-            resizeMode="contain"
+  // Cleanup modal on unmount
+  useEffect(() => {
+    return () => {
+      setResetPasswordModalVisible(false);
+    };
+  }, []);
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <View style={styles.header}>
+          <Image
+            source={require("../assets/splashscreen_logo.png")}
+            style={styles.logo}
           />
+          <Text style={styles.title}>{t("auth.signIn")}</Text>
         </View>
 
-        <Text style={styles.title}>{t("auth.signIn")}</Text>
-        <Text style={styles.subtitle}>{t("auth.signIn")} {t("general.continue").toLowerCase()}</Text>
-
         <View style={styles.formContainer}>
-          <Text style={styles.label}>{t("auth.email")}</Text>
           <TextInput
             style={styles.input}
             placeholder={t("auth.email")}
+            value={email}
+            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            value={formData.email}
-            onChangeText={(text) => setFormData({ ...formData, email: text })}
+            editable={!isLoading}
           />
 
-          <Text style={styles.label}>{t("auth.password")}</Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={styles.passwordInput}
-              placeholder={t("auth.password")}
-              secureTextEntry={!showPassword}
-              value={formData.password}
-              onChangeText={(text) => setFormData({ ...formData, password: text })}
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <MaterialIcons
-                name={showPassword ? "visibility" : "visibility-off"}
-                size={24}
-                color="#666"
-              />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>{t("auth.forgotPassword")}</Text>
-          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder={t("auth.password")}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            editable={!isLoading}
+          />
 
           <TouchableOpacity 
-            style={styles.signInButton} 
-            onPress={handleSignIn}
+            style={styles.forgotPassword}
+            onPress={() => setResetPasswordModalVisible(true)}
+            disabled={isLoading}
           >
-            <Text style={styles.signInButtonText}>{t("auth.signIn")}</Text>
+            <Text style={styles.forgotPasswordText}>
+              {t("auth.forgotPassword")}
+            </Text>
           </TouchableOpacity>
-        </View>
-      </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.signUpText}>{t("auth.dontHaveAccount")} </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-          <Text style={styles.signUpLink}>{t("auth.signUp")}</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <TouchableOpacity
+            style={[styles.signInButton, isLoading && styles.disabledButton]}
+            onPress={handleSignIn}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.signInButtonText}>{t("auth.signIn")}</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.signUpContainer}>
+            <Text style={styles.signUpText}>
+              {t("auth.dontHaveAccount")}
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("SignUp")} disabled={isLoading}>
+              <Text style={styles.signUpLink}>{t("auth.signUp")}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+
+      {/* Password Reset Modal - Only render when visible */}
+      {resetPasswordModalVisible && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={resetPasswordModalVisible}
+          onRequestClose={() => setResetPasswordModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>{t("auth.forgotPassword")}</Text>
+              
+              <Text style={styles.modalText}>
+                Enter your email address and we'll send you a link to reset your password.
+              </Text>
+              
+              <TextInput
+                style={styles.input}
+                placeholder={t("auth.email")}
+                value={resetEmail}
+                onChangeText={setResetEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!isLoading}
+              />
+              
+              <View style={styles.modalButtons}>
+                <TouchableOpacity 
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setResetPasswordModalVisible(false)}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.cancelButtonText}>{t("general.cancel")}</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[
+                    styles.modalButton, 
+                    styles.submitButton,
+                    isLoading && styles.disabledButton
+                  ]}
+                  onPress={handlePasswordReset}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.submitButtonText}>{t("general.submit")}</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    padding: 20,
   },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
+  header: {
+    alignItems: "center",
+    marginTop: 60,
+    marginBottom: 40,
   },
-  backButton: {
-    marginTop: 10,
-    marginLeft: 15,
-    padding: 5,
-  },
-  imageContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  image: {
-    width: 150,
-    height: 150,
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: "contain",
+    marginBottom: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#000",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 4,
-    marginBottom: 15,
+    color: "#148F55",
   },
   formContainer: {
-    flex: 1,
-    marginTop: 10,
-  },
-  label: {
-    fontSize: 14,
-    color: "#000",
-    marginBottom: 6,
+    width: "100%",
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-    marginBottom: 15,
-    height: 45,
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: "100%",
+    height: 50,
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 8,
     marginBottom: 15,
-    height: 45,
-  },
-  passwordInput: {
-    flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
-  },
-  eyeIcon: {
-    padding: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
   forgotPassword: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 20,
   },
   forgotPasswordText: {
@@ -185,31 +237,90 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   signInButton: {
+    width: "100%",
+    height: 50,
     backgroundColor: "#148F55",
-    padding: 12,
     borderRadius: 8,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 5,
+    marginBottom: 20,
+  },
+  disabledButton: {
+    backgroundColor: "#a0d0ba",
   },
   signInButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "bold",
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 15,
+  signUpContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
   },
   signUpText: {
-    color: "#666",
+    color: "#333",
     fontSize: 14,
+    marginRight: 5,
   },
   signUpLink: {
     color: "#148F55",
     fontSize: 14,
     fontWeight: "bold",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.25)',
+    elevation: 5
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#148F55',
+    marginBottom: 15,
+  },
+  modalText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 15,
+  },
+  modalButton: {
+    width: '48%',
+    height: 45,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  submitButton: {
+    backgroundColor: '#148F55',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

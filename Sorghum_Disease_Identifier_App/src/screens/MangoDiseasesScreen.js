@@ -23,90 +23,90 @@ const MangoDiseasesScreen = ({ navigation }) => {
       id: 1,
       name: t("diseases.anthracnose"),
       image: require("../assets/diseases/anthracnose.jpg"),
-      description: "Anthracnose is a fungal disease that affects mango leaves, flowers, and fruit. It appears as dark spots that can expand into larger lesions.",
+      description: t("diseases.anthracnoseDesc"),
       symptoms: [
-        "Dark, sunken lesions on fruit",
-        "Black, irregular spots on leaves",
-        "Small dark spots on flowers",
-        "Fruit drop"
+        t("diseases.anthracnoseSymptom1"),
+        t("diseases.anthracnoseSymptom2"),
+        t("diseases.anthracnoseSymptom3"),
+        t("diseases.anthracnoseSymptom4")
       ],
       treatment: [
-        "Apply fungicides during flowering period",
-        "Prune infected branches and leaves",
-        "Maintain proper spacing between trees for air circulation",
-        "Collect and destroy fallen leaves and fruits"
+        t("diseases.anthracnoseTreatment1"),
+        t("diseases.anthracnoseTreatment2"),
+        t("diseases.anthracnoseTreatment3"),
+        t("diseases.anthracnoseTreatment4")
       ]
     },
     {
       id: 2,
       name: t("diseases.powderyMildew"),
       image: require("../assets/diseases/powdery_mildew.jpg"),
-      description: "Powdery mildew is a fungal disease that appears as a white powdery coating on leaves, flowers, and young fruits.",
+      description: t("diseases.powderyMildewDesc"),
       symptoms: [
-        "White powdery growth on leaves and young tissue",
-        "Curling and distortion of young leaves",
-        "Flower drop",
-        "Stunted growth of new shoots"
+        t("diseases.powderyMildewSymptom1"),
+        t("diseases.powderyMildewSymptom2"),
+        t("diseases.powderyMildewSymptom3"),
+        t("diseases.powderyMildewSymptom4")
       ],
       treatment: [
-        "Apply sulfur-based fungicides",
-        "Ensure proper sunlight exposure",
-        "Avoid overhead irrigation",
-        "Maintain tree vigor through proper fertilization"
+        t("diseases.powderyMildewTreatment1"),
+        t("diseases.powderyMildewTreatment2"),
+        t("diseases.powderyMildewTreatment3"),
+        t("diseases.powderyMildewTreatment4")
       ]
     },
     {
       id: 3,
       name: t("diseases.blackSpot"),
       image: require("../assets/diseases/anthracnose.jpg"),
-      description: "Black spot disease causes circular black lesions on mango leaves and fruit, often leading to premature leaf drop.",
+      description: t("diseases.blackSpotDesc"),
       symptoms: [
-        "Black circular spots on leaves",
-        "Yellow halo around spots",
-        "Premature leaf drop",
-        "Fruit spotting"
+        t("diseases.blackSpotSymptom1"),
+        t("diseases.blackSpotSymptom2"),
+        t("diseases.blackSpotSymptom3"),
+        t("diseases.blackSpotSymptom4")
       ],
       treatment: [
-        "Apply copper-based fungicides",
-        "Improve air circulation by pruning",
-        "Remove and destroy infected plant material",
-        "Avoid wetting leaves during irrigation"
+        t("diseases.blackSpotTreatment1"),
+        t("diseases.blackSpotTreatment2"),
+        t("diseases.blackSpotTreatment3"),
+        t("diseases.blackSpotTreatment4")
       ]
     },
     {
       id: 4,
       name: t("diseases.stemEndRot"),
       image: require("../assets/diseases/powdery_mildew.jpg"),
-      description: "Stem end rot is a post-harvest disease that starts at the stem end of the fruit and spreads, causing dark areas and fruit rot.",
+      description: t("diseases.stemEndRotDesc"),
       symptoms: [
-        "Dark, water-soaked areas near the stem",
-        "Soft, rotting tissue",
-        "Fruit discoloration",
-        "Unpleasant odor"
+        t("diseases.stemEndRotSymptom1"),
+        t("diseases.stemEndRotSymptom2"),
+        t("diseases.stemEndRotSymptom3"),
+        t("diseases.stemEndRotSymptom4")
       ],
       treatment: [
-        "Harvest fruits with short stems",
-        "Handle fruits carefully to avoid injuries",
-        "Apply fungicide treatments before harvest",
-        "Store fruits at proper temperatures"
+        t("diseases.stemEndRotTreatment1"),
+        t("diseases.stemEndRotTreatment2"),
+        t("diseases.stemEndRotTreatment3"),
+        t("diseases.stemEndRotTreatment4")
       ]
     },
     {
       id: 5,
       name: t("diseases.bacterialCanker"),
       image: require("../assets/diseases/anthracnose.jpg"),
-      description: "Bacterial canker is a serious disease caused by bacteria that leads to cankers, fruit spotting, and tree decline.",
+      description: t("diseases.bacterialCankerDesc"),
       symptoms: [
-        "Raised, dark lesions on stems and branches",
-        "Gummy ooze from cracks",
-        "Water-soaked angular leaf spots",
-        "Black spots on fruits with white halos"
+        t("diseases.bacterialCankerSymptom1"),
+        t("diseases.bacterialCankerSymptom2"),
+        t("diseases.bacterialCankerSymptom3"),
+        t("diseases.bacterialCankerSymptom4")
       ],
       treatment: [
-        "Prune and burn infected branches",
-        "Apply copper-based bactericides",
-        "Avoid overhead irrigation",
-        "Disinfect pruning tools between cuts"
+        t("diseases.bacterialCankerTreatment1"),
+        t("diseases.bacterialCankerTreatment2"),
+        t("diseases.bacterialCankerTreatment3"),
+        t("diseases.bacterialCankerTreatment4")
       ]
     }
   ];
@@ -243,10 +243,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: "hidden",
     elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
   },
   diseaseImage: {
     width: "100%",

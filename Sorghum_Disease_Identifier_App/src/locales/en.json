@@ -43,6 +43,7 @@
     "enterLocation": "Enter location"
   },
   "identification": {
+    "identify": "Identify",
     "touchToIdentify": "Touch to identify",
     "camera": "Camera",
     "gallery": "Gallery",
@@ -57,7 +58,10 @@
     "noImageSelected": "No image selected",
     "identificationFailed": "Identification failed. Please try again.",
     "analyze": "Analyze",
-    "newScan": "New Scan"
+    "newScan": "New Scan",
+    "treatment1": "Apply fungicides during flowering period",
+    "treatment2": "Prune infected branches and leaves",
+    "treatment3": "Maintain proper tree spacing"
   },
   "profile": {
     "myProfile": "My Profile",
@@ -79,9 +83,28 @@
     "accountSettings": "Account Settings",
     "preferences": "Preferences",
     "locationServices": "Location Services",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "clearStoredData": "Clear Stored Data",
+    "clearDataTitle": "Clear All Stored Data",
+    "clearDataMessage": "This will delete all saved identifications, reports, and settings. This action cannot be undone.",
+    "clearData": "Clear Data",
+    "dataCleared": "All data has been cleared",
+    "offlineLogoutWarning": "Offline Logout",
+    "offlineLogoutMessage": "You are currently offline. Logging out while offline may cause loss of unsaved data.",
+    "logoutConfirmTitle": "Confirm Logout",
+    "logoutConfirmMessage": "Are you sure you want to log out? Any unsaved data will be lost.",
+    "activityHistory": "Activity History",
+    "noActivityYet": "No activity yet",
+    "savedReports": "Saved Reports",
+    "noReportsYet": "No reports yet",
+    "reports": "Reports",
+    "diseases": "Diseases",
+    "activities": "Activities",
+    "analytics": "Analytics",
+    "confirmLogout": "Confirm Logout"
   },
   "diseases": {
+    "diseases": "Diseases",
     "anthracnose": "Anthracnose",
     "powderyMildew": "Powdery Mildew",
     "blackSpot": "Black Spot",
@@ -99,14 +122,73 @@
     "notFound": "No Disease Found",
     "reportDescription": "Help improve our database by reporting this disease",
     "confidence": "Confidence",
-    "name": "Disease Name"
+    "name": "Disease Name",
+    
+    "anthracnoseDesc": "Anthracnose is a fungal disease that affects mango leaves, flowers, and fruit. It appears as dark spots that can expand into larger lesions.",
+    "anthracnoseSymptom1": "Dark, sunken lesions on fruit",
+    "anthracnoseSymptom2": "Black, irregular spots on leaves",
+    "anthracnoseSymptom3": "Small dark spots on flowers",
+    "anthracnoseSymptom4": "Fruit drop",
+    "anthracnoseTreatment1": "Apply fungicides during flowering period",
+    "anthracnoseTreatment2": "Prune infected branches and leaves",
+    "anthracnoseTreatment3": "Maintain proper spacing between trees for air circulation",
+    "anthracnoseTreatment4": "Collect and destroy fallen leaves and fruits",
+    
+    "powderyMildewDesc": "Powdery mildew is a fungal disease that appears as a white powdery coating on leaves, flowers, and young fruits.",
+    "powderyMildewSymptom1": "White powdery growth on leaves and young tissue",
+    "powderyMildewSymptom2": "Curling and distortion of young leaves",
+    "powderyMildewSymptom3": "Flower drop",
+    "powderyMildewSymptom4": "Stunted growth of new shoots",
+    "powderyMildewTreatment1": "Apply sulfur-based fungicides",
+    "powderyMildewTreatment2": "Ensure proper sunlight exposure",
+    "powderyMildewTreatment3": "Avoid overhead irrigation",
+    "powderyMildewTreatment4": "Maintain tree vigor through proper fertilization",
+    
+    "blackSpotDesc": "Black spot disease causes circular black lesions on mango leaves and fruit, often leading to premature leaf drop.",
+    "blackSpotSymptom1": "Black circular spots on leaves",
+    "blackSpotSymptom2": "Yellow halo around spots",
+    "blackSpotSymptom3": "Premature leaf drop",
+    "blackSpotSymptom4": "Fruit spotting",
+    "blackSpotTreatment1": "Apply copper-based fungicides",
+    "blackSpotTreatment2": "Improve air circulation by pruning",
+    "blackSpotTreatment3": "Remove and destroy infected plant material",
+    "blackSpotTreatment4": "Avoid wetting leaves during irrigation",
+    
+    "stemEndRotDesc": "Stem end rot is a post-harvest disease that starts at the stem end of the fruit and spreads, causing dark areas and fruit rot.",
+    "stemEndRotSymptom1": "Dark, water-soaked areas near the stem",
+    "stemEndRotSymptom2": "Soft, rotting tissue",
+    "stemEndRotSymptom3": "Fruit discoloration",
+    "stemEndRotSymptom4": "Unpleasant odor",
+    "stemEndRotTreatment1": "Harvest fruits with short stems",
+    "stemEndRotTreatment2": "Handle fruits carefully to avoid injuries",
+    "stemEndRotTreatment3": "Apply fungicide treatments before harvest",
+    "stemEndRotTreatment4": "Store fruits at proper temperatures",
+    
+    "bacterialCankerDesc": "Bacterial canker is a serious disease caused by bacteria that leads to cankers, fruit spotting, and tree decline.",
+    "bacterialCankerSymptom1": "Raised, dark lesions on stems and branches",
+    "bacterialCankerSymptom2": "Gummy ooze from cracks",
+    "bacterialCankerSymptom3": "Water-soaked angular leaf spots",
+    "bacterialCankerSymptom4": "Black spots on fruits with white halos",
+    "bacterialCankerTreatment1": "Prune and burn infected branches",
+    "bacterialCankerTreatment2": "Apply copper-based bactericides",
+    "bacterialCankerTreatment3": "Avoid overhead irrigation",
+    "bacterialCankerTreatment4": "Disinfect pruning tools between cuts"
   },
   "offline": {
     "offlineMode": "Offline Mode",
+    "online": "Online",
     "savedItems": "Saved Items",
     "syncWhenOnline": "Data will sync when you're back online",
     "pendingUploads": "Pending Uploads",
-    "lastSynced": "Last Synced"
+    "lastSynced": "Last Synced",
+    "neverSynced": "Never synced",
+    "syncNow": "Sync Now",
+    "syncSuccessful": "Sync successful",
+    "syncFailed": "Sync failed",
+    "connectionStatus": "Connection Status",
+    "dataUsage": "Data Usage",
+    "offlineData": "Offline Data",
+    "cacheSize": "Cache Size"
   },
   "reporting": {
     "reportDisease": "Report Disease",
@@ -124,7 +206,9 @@
     "weatherConditions": "Weather Conditions",
     "submissionSuccess": "Report submitted successfully",
     "submissionFailed": "Report submission failed",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "notes": "Notes",
+    "locationUnknown": "Location unknown"
   },
   "splash": {
     "welcome": "Welcome to the Mango Disease Identifier App!",
@@ -136,5 +220,40 @@
     "cultivationTips": "Cultivation Tips",
     "next": "Next",
     "back": "Back"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "mangoDiseaseFinder": "Mango Disease Finder",
+    "features": "Features",
+    "identifyDisease": "Identify Disease",
+    "identifyDescription": "Take a photo or upload an image to identify diseases",
+    "diseaseLibrary": "Disease Library",
+    "diseaseLibraryDescription": "Browse common mango diseases and their treatments",
+    "viewReports": "View Reports",
+    "reportsDescription": "View your disease reports and statistics",
+    "recentReports": "Recent Reports",
+    "seeAll": "See All",
+    "noReportsYet": "No reports yet",
+    "createReport": "Create Report",
+    "tipsAndAdvice": "Tips & Advice",
+    "preventionTip": "Prune your mango trees regularly to improve air circulation and reduce disease risk",
+    "wateringTip": "Water your mango trees at the base to prevent leaf diseases"
+  },
+  "theme": {
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "switchToLight": "Switch to Light Mode",
+    "switchToDark": "Switch to Dark Mode",
+    "themeSettings": "Theme Settings",
+    "systemDefault": "System Default"
+  },
+  "reports": {
+    "diseaseReports": "Disease Reports",
+    "noReportsYet": "No reports yet",
+    "identifyDisease": "Identify Disease",
+    "noDataToDisplay": "No data to display",
+    "diseasesDistribution": "Diseases Distribution",
+    "totalReports": "Total Reports",
+    "uniqueDiseases": "Unique Diseases"
   }
 }
