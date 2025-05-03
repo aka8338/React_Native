@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform, StatusBar } from 'react-native';
 import OfflineIndicator from './OfflineIndicator';
 
 /**
@@ -10,6 +10,9 @@ import OfflineIndicator from './OfflineIndicator';
 const ScreenWithFooter = ({ children, navigation }) => {
   return (
     <View style={styles.container}>
+      {/* Status bar space padding */}
+      <View style={styles.statusBarSpace} />
+      
       <View style={styles.content}>
         {children}
       </View>
@@ -24,6 +27,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
+  },
+  statusBarSpace: {
+    height: Platform.OS === 'ios' ? 50 : 30,
+    backgroundColor: '#148F55',
   },
   content: {
     flex: 1,

@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useRef, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from "../components/SplashScreen";
 import HomeScreen from "../screens/HomeScreen";
 import IdentificationScreen from "../screens/IdentificationScreen";
@@ -164,29 +165,35 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
 
   if (isLoading) {
     // If still loading auth state, return empty container
-    return <NavigationContainer ref={navigationRef} />;
+    return (
+      <SafeAreaProvider>
+        <NavigationContainer ref={navigationRef} />
+      </SafeAreaProvider>
+    );
   }
 
   return (
-    <NavigationContainer 
-      ref={navigationRef}
-      documentTitle={{
-        formatter: (options, route) => 
-          options?.title ?? route?.name ?? "Mango Disease Identifier"
-      }}
-    >
-      <Stack.Navigator 
-        initialRouteName={initialStack}
-        screenOptions={{
-          headerShown: false,
-          presentation: 'card', // More compatible with web
-          animationEnabled: true,
+    <SafeAreaProvider>
+      <NavigationContainer 
+        ref={navigationRef}
+        documentTitle={{
+          formatter: (options, route) => 
+            options?.title ?? route?.name ?? "Mango Disease Identifier"
         }}
       >
-        <Stack.Screen name="Auth" component={AuthStack} />
-        <Stack.Screen name="Main" component={MainStack} />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Navigator 
+          initialRouteName={initialStack}
+          screenOptions={{
+            headerShown: false,
+            presentation: 'card', // More compatible with web
+            animationEnabled: true,
+          }}
+        >
+          <Stack.Screen name="Auth" component={AuthStack} />
+          <Stack.Screen name="Main" component={MainStack} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 

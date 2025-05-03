@@ -9,7 +9,6 @@ import {
   ImageBackground,
   ActivityIndicator
 } from "react-native";
-import WeatherReport from "../components/TemperatureDisplay";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import ScreenWithFooter from "../components/ScreenWithFooter";
@@ -105,7 +104,7 @@ const HomeScreen = ({ navigation }) => {
             resizeMode="cover"
           >
             <View style={styles.headerOverlay}>
-              {/* Language switcher in the top right corner */}
+              {/* Language switcher */}
               <View style={styles.languageSwitcherContainer}>
                 <LanguageSwitcher />
               </View>
@@ -119,12 +118,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </ImageBackground>
           
-          {/* Weather report */}
-          <View style={[styles.weatherCard, { backgroundColor: theme.cardColor }]}>
-            <WeatherReport />
-          </View>
-          
-          {/* Features */}
+          {/* Main features - most important section first */}
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, { color: theme.textColor }]}>{t('home.features')}</Text>
             
@@ -153,7 +147,7 @@ const HomeScreen = ({ navigation }) => {
             />
           </View>
           
-          {/* Recent reports */}
+          {/* Recent reports - second most important */}
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: theme.textColor }]}>{t('home.recentReports')}</Text>
@@ -189,7 +183,7 @@ const HomeScreen = ({ navigation }) => {
             )}
           </View>
           
-          {/* Tips & advice section */}
+          {/* Tips section - last */}
           <View style={styles.sectionContainer}>
             <Text style={[styles.sectionTitle, { color: theme.textColor }]}>{t('home.tipsAndAdvice')}</Text>
             
@@ -207,7 +201,7 @@ const HomeScreen = ({ navigation }) => {
               <Text style={[styles.tipText, { color: theme.textColor }]}>{t('home.wateringTip')}</Text>
             </View>
             
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle Button - at the very bottom */}
             <TouchableOpacity 
               style={[styles.themeToggleButton, { backgroundColor: theme.primaryColor }]}
               onPress={toggleTheme}
@@ -235,13 +229,14 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    paddingBottom: 16,
   },
   headerBackground: {
-    height: 180,
+    height: 220,
   },
   headerOverlay: {
     height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     padding: 20,
     justifyContent: 'flex-end',
   },
@@ -249,33 +244,23 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "500",
-    marginBottom: 4,
+    marginBottom: 8,
+    marginTop: 40,
   },
   appTitle: {
     color: "#FFFFFF",
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
   },
   languageSwitcherContainer: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 20,
+    right: 15,
     zIndex: 10,
-  },
-  weatherCard: {
-    margin: 16,
-    marginTop: -30,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   sectionContainer: {
     margin: 16,
-    marginTop: 8,
+    marginTop: 16,
   },
   sectionHeader: {
     flexDirection: 'row',

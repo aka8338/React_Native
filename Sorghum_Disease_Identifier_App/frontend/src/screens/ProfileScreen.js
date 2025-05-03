@@ -451,6 +451,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
+    paddingTop: 10,
     backgroundColor: "#FFFFFF",
   },
   headerTitle: {
@@ -460,8 +461,8 @@ const styles = StyleSheet.create({
   },
   languageSwitcher: {
     position: "absolute",
-    top: 0,
-    right: 0,
+    top: 15,
+    right: 15,
   },
   profileSection: {
     alignItems: "center",

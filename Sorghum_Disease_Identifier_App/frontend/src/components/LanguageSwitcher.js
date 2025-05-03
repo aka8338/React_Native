@@ -99,7 +99,10 @@ const LanguageSwitcher = ({ style }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
+    position: 'absolute',
+    top: 20,
+    right: 15,
+    zIndex: 100,
   },
   languageButton: {
     flexDirection: 'row',
@@ -108,6 +111,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   languageButtonText: {
     color: '#148F55',
