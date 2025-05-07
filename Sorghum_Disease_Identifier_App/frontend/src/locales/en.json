@@ -32,7 +32,9 @@
     "verification": "Verification",
     "enterCode": "Enter Code",
     "sentCode": "Code sent to",
+    "sentToEmail": "Verification code sent to",
     "resend": "Resend",
+    "resendEmail": "Resend Email",
     "verify": "Verify"
   },
   "weather": {

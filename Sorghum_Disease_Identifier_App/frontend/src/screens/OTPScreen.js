@@ -1,177 +1,347 @@
-import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
-  Alert,
-  StyleSheet,
+  View,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
-} from "react-native";
-import { useTranslation } from "react-i18next";
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ActivityIndicator,
+  BackHandler
+} from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../contexts/AuthContext';
 
 const OTPScreen = ({ route, navigation }) => {
-  const { t } = useTranslation();
-  const { formData } = route.params;
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [timer, setTimer] = useState(30);
-  const otpInputs = useRef([]);
+  const [otp, setOtp] = useState('');
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState(30);
+  const { verifyOTP, resendOTP } = useAuth();
 
+  // Override hardware back button to prevent going back to signup
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (email) {
+        // Show confirmation dialog
+        Alert.alert(
+          'Cancel Verification?',
+          'Are you sure you want to cancel the verification process?',
+          [
+            { text: 'No', style: 'cancel' },
+            { 
+              text: 'Yes', 
+              onPress: () => {
+                // Clear pending verification data
+                AsyncStorage.removeItem('pendingOtpEmail');
+                AsyncStorage.removeItem('pendingOtpTimestamp');
+                
+                // Go to Sign In instead of back to Sign Up - prevents splash screen
+                navigation.replace('Signin');
+              }
+            }
+          ]
+        );
+        return true; // Prevents default back behavior
+      }
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [email, navigation]);
+
+  // Get email either from route params or AsyncStorage
+  useEffect(() => {
+    const getEmail = async () => {
+      console.log('OTP Screen - Initializing, checking for email');
+      
+      let userEmail = '';
+      
+      try {
+        // First check route params
+        if (route?.params?.formData?.email) {
+          userEmail = route.params.formData.email;
+          console.log('OTP Screen - Email from route params:', userEmail);
+        } else {
+          // Check AsyncStorage as fallback
+          const storedEmail = await AsyncStorage.getItem('pendingOtpEmail');
+          console.log('OTP Screen - Email from AsyncStorage:', storedEmail);
+          
+          if (storedEmail) {
+            userEmail = storedEmail;
+          }
+        }
+        
+        if (userEmail) {
+          console.log('OTP Screen - Setting email state to:', userEmail);
+          setEmail(userEmail);
+          Alert.alert('OTP Sent', `A verification code has been sent to ${userEmail}`);
+        } else {
+          console.error('OTP Screen - Could not determine email address');
+          Alert.alert(
+            'Error', 
+            'Could not determine your email address',
+            [
+              { 
+                text: 'Go Back',
+                onPress: () => navigation.replace('Signin') // Go to SignIn rather than back to ensure no splash screen
+              }
+            ]
+          );
+        }
+      } catch (error) {
+        console.error('OTP Screen - Error getting email:', error);
+        Alert.alert(
+          'Error',
+          'Failed to set up verification. Please try again.',
+          [{ text: 'OK', onPress: () => navigation.replace('Signin') }]
+        );
+      }
+    };
+    
+    getEmail();
+    
+    // Start countdown for resend button
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
+    
+    // Clean up timer
+    return () => clearInterval(timer);
+  }, [route?.params, navigation]);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleOtpChange = (value, index) => {
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Move to next input if value is entered
-    if (value && index < 5) {
-      otpInputs.current[index + 1].focus();
-    }
-  };
-
-  const handleResendOTP = () => {
-    if (timer === 0) {
-      // TODO: Implement resend OTP logic
-      setTimer(30);
-      Alert.alert("Success", "OTP has been resent");
-    }
-  };
-
-  const handleVerifyOTP = () => {
-    const enteredOTP = otp.join("");
-    if (enteredOTP.length !== 6) {
-      Alert.alert("Error", "Please enter complete OTP");
+  const handleVerifyOTP = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Email address not found');
       return;
     }
+    
+    if (!otp || otp.length !== 6) {
+      Alert.alert('Error', 'Please enter a valid 6-digit OTP');
+      return;
+    }
+    
+    setIsLoading(true);
+    console.log('Verifying OTP:', otp, 'for email:', email);
+    
+    try {
+      const result = await verifyOTP(email, otp);
+      console.log('OTP verification result:', result);
+      
+      if (result.success) {
+        // Clear stored email since verification is complete
+        await AsyncStorage.removeItem('pendingOtpEmail');
+        await AsyncStorage.removeItem('pendingOtpTimestamp');
+        
+        console.log('OTP verification successful, navigating to SignIn screen');
+        
+        // Show success message first, then navigate
+        Alert.alert(
+          'Success', 
+          'Account verified successfully! Please sign in with your credentials.',
+          [
+            { 
+              text: 'Sign In', 
+              onPress: () => {
+                // Replace current screen with SignIn to prevent going back
+                navigation.replace('Signin', { verified: true, email });
+              }
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Error', result.error || 'Verification failed. Please check the code and try again.');
+      }
+    } catch (error) {
+      console.error('Error during OTP verification:', error);
+      Alert.alert('Error', 'Failed to verify OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // TODO: Implement OTP verification logic
-    console.log("Verifying OTP:", enteredOTP);
-    console.log("Form Data:", formData);
-    navigation.navigate("Signin");
+  // For the onPress of the back button in the UI (not hardware back)
+  const handleBackPress = () => {
+    Alert.alert(
+      'Cancel Verification?',
+      'Are you sure you want to cancel the verification process?',
+      [
+        { text: 'No', style: 'cancel' },
+        { 
+          text: 'Yes', 
+          onPress: () => {
+            AsyncStorage.removeItem('pendingOtpEmail');
+            AsyncStorage.removeItem('pendingOtpTimestamp');
+            navigation.replace('Signin');
+          }
+        }
+      ]
+    );
+  };
 
-    // For now, just show success and navigate to Home
-    // Alert.alert("Success", "Account created successfully!", [
-    //   {
-    //     text: "OK",
-    //     onPress: () => navigation.navigate("Signin"),
-    //   },
-    // ]);
-};
+  const handleResendOTP = async () => {
+    if (countdown > 0 || !email) return;
+    
+    setCountdown(30);
+    console.log('Resending OTP to:', email);
+    
+    try {
+      const result = await resendOTP(email);
+      
+      if (result.success) {
+        Alert.alert('Success', `A new OTP has been sent to ${email}`);
+      } else {
+        Alert.alert('Error', result.error || 'Failed to resend OTP');
+        setCountdown(0);
+      }
+    } catch (error) {
+      console.error('Error resending OTP:', error);
+      Alert.alert('Error', 'Failed to resend OTP. Please try again.');
+      setCountdown(0);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <MaterialIcons name="verified-user" size={50} color="#148F55" />
-      <Text style={styles.title}>{t("otp.verification")}</Text>
-      <Text style={styles.subtitle}>
-        {t("otp.enterCode")}{"\n"}
-        {t("otp.sentCode")} {formData.phoneNumber}
-      </Text>
-
-      <View style={styles.otpContainer}>
-        {otp.map((digit, index) => (
-          <TextInput
-            key={index}
-            ref={(input) => (otpInputs.current[index] = input)}
-            style={styles.otpInput}
-            maxLength={1}
-            keyboardType="number-pad"
-            value={digit}
-            onChangeText={(value) => handleOtpChange(value, index)}
-          />
-        ))}
-      </View>
-
-      <TouchableOpacity
-        style={[styles.resendButton, timer > 0 && styles.resendButtonDisabled]}
-        onPress={handleResendOTP}
-        disabled={timer > 0}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
       >
-        <Text
-          style={[
-            styles.resendButtonText,
-            timer > 0 && styles.resendButtonTextDisabled,
-          ]}
+        {/* Back button */}
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={handleBackPress}
         >
-          {t("otp.resend")} {timer > 0 ? `(${timer}s)` : ""}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.verifyButton} onPress={handleVerifyOTP}>
-        <Text style={styles.verifyButtonText}>{t("otp.verify")} & {t("general.continue")}</Text>
-      </TouchableOpacity>
-    </View>
+          <MaterialIcons name="arrow-back" size={24} color="#148F55" />
+        </TouchableOpacity>
+        
+        <View style={styles.content}>
+          <MaterialIcons name="verified-user" size={64} color="#148F55" />
+          
+          <Text style={styles.title}>Verify Your Email</Text>
+          <Text style={styles.subtitle}>
+            We've sent a 6-digit verification code to{'\n'}
+            <Text style={styles.emailText}>{email}</Text>
+          </Text>
+          
+          <TextInput
+            style={styles.otpInput}
+            placeholder="Enter 6-digit code"
+            keyboardType="number-pad"
+            maxLength={6}
+            value={otp}
+            onChangeText={setOtp}
+          />
+          
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={handleVerifyOTP}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.verifyButtonText}>Verify</Text>
+            )}
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[
+              styles.resendButton,
+              countdown > 0 && styles.resendButtonDisabled
+            ]}
+            onPress={handleResendOTP}
+            disabled={countdown > 0}
+          >
+            <Text style={styles.resendButtonText}>
+              Resend Code {countdown > 0 ? `(${countdown}s)` : ''}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  backButton: {
+    marginTop: 10,
+    marginLeft: 15,
+    padding: 10,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#148F55",
+    fontWeight: 'bold',
+    color: '#148F55',
     marginTop: 20,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
-    textAlign: "center",
+    color: '#666',
+    textAlign: 'center',
     marginBottom: 30,
   },
-  otpContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 20,
-    marginBottom: 30,
+  emailText: {
+    fontWeight: 'bold',
+    color: '#333',
   },
   otpInput: {
-    width: 45,
-    height: 45,
+    width: '100%',
+    height: 60,
     borderWidth: 1,
-    borderColor: "#148F55",
+    borderColor: '#148F55',
     borderRadius: 10,
-    textAlign: "center",
     fontSize: 20,
-    backgroundColor: "#f9f9f9",
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  verifyButton: {
+    backgroundColor: '#148F55',
+    width: '100%',
+    height: 50,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  verifyButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   resendButton: {
-    marginBottom: 20,
+    padding: 10,
   },
   resendButtonDisabled: {
     opacity: 0.5,
   },
   resendButtonText: {
-    color: "#148F55",
+    color: '#148F55',
     fontSize: 16,
-  },
-  resendButtonTextDisabled: {
-    color: "#666",
-  },
-  verifyButton: {
-    backgroundColor: "#148F55",
-    padding: 15,
-    borderRadius: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  verifyButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
   },
 });
 

@@ -15,16 +15,52 @@ import SignUpScreen from "../screens/SignUpScreen";
 import DiseaseReportScreen from "../screens/DiseaseReportScreen";
 import ReportsScreen from "../screens/ReportsScreen";
 import { useAuth } from "../contexts/AuthContext";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Separate stacks for authenticated and unauthenticated users
 const AuthStack = () => {
+  // Get pending OTP email to determine if we should show OTP screen
+  const [initialRoute, setInitialRoute] = useState("Splash");
+  
+  useEffect(() => {
+    const checkPendingOtp = async () => {
+      try {
+        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
+        console.log('AuthStack: Checking for pending OTP verification');
+        
+        if (pendingOtpEmail) {
+          console.log('AuthStack: Found pending OTP verification, setting initial route to OTP');
+          setInitialRoute("OTP");
+        } else {
+          console.log('AuthStack: No pending OTP, using default Splash screen');
+        }
+      } catch (error) {
+        console.error('AuthStack: Error checking pending OTP:', error);
+      }
+    };
+    
+    checkPendingOtp();
+  }, []);
+
+  // This component needs to have the right navigator with proper screens
+  // Force re-render when initialRoute changes
+  const [key, setKey] = useState(0);
+  useEffect(() => {
+    setKey(prev => prev + 1);
+  }, [initialRoute]);
+
   return (
     <Stack.Navigator
+      key={`auth-stack-${key}`}
+      initialRouteName={initialRoute}
       screenOptions={{
         headerShown: false,
+        // Disable all animation when navigating between auth screens
+        // This prevents flash of splash screen
+        animationEnabled: false
       }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
@@ -160,8 +196,36 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const navigationRef = useRef(null);
 
+  console.log('AppNavigator initializing - isAuthenticated:', isAuthenticated, 'initialRouteName:', initialRouteName);
+  
+  // Check for pending OTP - this is critical to avoid splash screen
+  const [hasPendingOtp, setHasPendingOtp] = useState(false);
+  
+  useEffect(() => {
+    const checkOtpStatus = async () => {
+      try {
+        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
+        setHasPendingOtp(!!pendingOtpEmail);
+      } catch (error) {
+        console.error('Error checking OTP status:', error);
+      }
+    };
+    
+    checkOtpStatus();
+  }, []);
+
   // Initial determination of which stack to show
-  const initialStack = isAuthenticated ? "Main" : "Auth";
+  let startStack = 'Auth';
+  
+  if (isAuthenticated) {
+    console.log('AppNavigator: User is authenticated, using Main stack');
+    startStack = 'Main';
+  } else if (hasPendingOtp) {
+    console.log('AppNavigator: Pending OTP found, ensuring Auth stack is used');
+    startStack = 'Auth';
+  } else {
+    console.log('AppNavigator: User is not authenticated, using Auth stack');
+  }
 
   if (isLoading) {
     // If still loading auth state, return empty container
@@ -178,14 +242,14 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
         ref={navigationRef}
         documentTitle={{
           formatter: (options, route) => 
-            options?.title ?? route?.name ?? "Mango Disease Identifier"
+            options?.title ?? route?.name ?? "Sorghum Disease Identifier"
         }}
       >
         <Stack.Navigator 
-          initialRouteName={initialStack}
+          initialRouteName={startStack}
           screenOptions={{
             headerShown: false,
-            presentation: 'card', // More compatible with web
+            presentation: 'card',
             animationEnabled: true,
           }}
         >

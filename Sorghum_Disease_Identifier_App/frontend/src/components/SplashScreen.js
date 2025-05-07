@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { changeLanguage } from "../i18n";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -105,6 +106,24 @@ const SplashScreen = ({ navigation }) => {
       setShowLanguageModal(false);
     };
   }, []);
+
+  // Check for pending OTP verification
+  useEffect(() => {
+    const checkPendingOtp = async () => {
+      try {
+        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
+        if (pendingOtpEmail) {
+          console.log('SplashScreen: Found pending OTP verification, navigating to OTP screen');
+          navigation.navigate('OTP');
+          return;
+        }
+      } catch (error) {
+        console.error('SplashScreen: Error checking pending OTP:', error);
+      }
+    };
+    
+    checkPendingOtp();
+  }, [navigation]);
 
   const words = pages[currentPage].text.split(" ");
 

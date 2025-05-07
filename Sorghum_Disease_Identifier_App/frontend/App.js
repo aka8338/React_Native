@@ -46,18 +46,64 @@ const App = () => {
         // Pre-load fonts, make API calls, etc.
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Check if user is already logged in
-        const userData = await AsyncStorage.getItem('userData');
-        if (userData) {
-          const parsedData = JSON.parse(userData);
-          // If user data exists and has unexpired session, skip splash/login
-          if (parsedData.isAuthenticated) {
-            // Check if it's the first launch after login
-            const hasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
-            if (hasSeenOnboarding) {
-              setInitialRouteName('Home');
+        // Check if there's a pending OTP verification - this takes priority
+        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
+        const pendingOtpTimestamp = await AsyncStorage.getItem('pendingOtpTimestamp');
+        console.log('App initialization - Pending OTP email:', pendingOtpEmail);
+        
+        if (pendingOtpEmail) {
+          // Check if OTP request is stale (older than 30 minutes)
+          const now = Date.now();
+          const otpTime = parseInt(pendingOtpTimestamp || '0', 10);
+          const isStale = now - otpTime > 30 * 60 * 1000; // 30 minutes
+          
+          if (isStale) {
+            // Clean up stale OTP request
+            console.log('App initialization - Found stale OTP request, cleaning up');
+            await AsyncStorage.removeItem('pendingOtpEmail');
+            await AsyncStorage.removeItem('pendingOtpTimestamp');
+          } else {
+            // Valid OTP verification pending, go directly to Auth stack
+            console.log('App initialization - Pending OTP verification detected, setting initial route to Auth');
+            setInitialRouteName('Auth');
+            
+            // Reset stored language to English for OTP flow
+            try {
+              await AsyncStorage.setItem('appLanguage', 'en');
+              console.log('App initialization - Reset language to English for OTP flow');
+            } catch (langError) {
+              console.error('App initialization - Failed to reset language:', langError);
             }
+            
+            // Skip checking other states since we're going to OTP screen
+            setAppIsReady(true);
+            return;
           }
+        }
+        
+        // No pending OTP, check if user is already logged in
+        const userData = await AsyncStorage.getItem('userData');
+        console.log('App initialization - User data:', userData);
+        
+        if (userData) {
+          try {
+            const parsedData = JSON.parse(userData);
+            // If user data exists and has authenticated session, go to Home
+            if (parsedData.isAuthenticated) {
+              console.log('App initialization - Authenticated user found, setting initial route to Main');
+              setInitialRouteName('Main');
+            } else {
+              // User data exists but not authenticated
+              console.log('App initialization - User data found but not authenticated, setting initial route to Auth');
+              setInitialRouteName('Auth');
+            }
+          } catch (parseError) {
+            console.error('App initialization - Error parsing user data:', parseError);
+            setInitialRouteName('Auth');
+          }
+        } else {
+          // No user data, go to default splash screen
+          console.log('App initialization - No user data found, keeping default Splash screen');
         }
       } catch (e) {
         console.warn('Error in App initialization:', e);

@@ -25,12 +25,22 @@ export const LanguageProvider = ({ children }) => {
     const loadSavedLanguage = async () => {
       try {
         const savedLanguage = await AsyncStorage.getItem('appLanguage');
+        
+        // Always default to English if no valid language is found
         if (savedLanguage && Object.values(LANGUAGES).includes(savedLanguage)) {
+          console.log('Using saved language preference:', savedLanguage);
           setCurrentLanguage(savedLanguage);
           await changeLanguage(savedLanguage, false); // Don't save again
+        } else {
+          console.log('No valid language found, defaulting to English');
+          setCurrentLanguage(LANGUAGES.ENGLISH);
+          await changeLanguage(LANGUAGES.ENGLISH, true);
         }
       } catch (error) {
         console.error('Error loading language preference:', error);
+        // Default to English on error
+        setCurrentLanguage(LANGUAGES.ENGLISH);
+        await changeLanguage(LANGUAGES.ENGLISH, true);
       } finally {
         setIsLoading(false);
       }

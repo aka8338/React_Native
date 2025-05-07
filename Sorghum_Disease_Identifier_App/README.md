@@ -1,85 +1,120 @@
-# Mango Disease Identifier App
+# Sorghum Disease Identifier App
 
-A React Native mobile application designed to help farmers identify diseases in mango plants using machine learning.
+A comprehensive mobile application for identifying diseases in sorghum plants using image recognition, with secure user authentication and data management.
+
+## Project Structure
+
+This project is divided into two main parts:
+
+1. **Frontend**: A React Native mobile application
+2. **Backend**: A Flask API with MongoDB database
 
 ## Features
 
-### Core Features
-- Disease identification through camera or gallery images
-- Comprehensive database of common mango diseases with treatment information
-- Weather reports for local conditions
-- Multi-language support (English, Amharic, and Oromo)
+- User authentication (signup, login, email verification)
+- Email-based OTP verification
+- Password reset functionality
+- Disease identification via image upload
+- Offline mode support
+- Multi-language support
+- Light/dark theme toggle
+- Comprehensive disease information database
+- User profile and history management
 
-### Recent Improvements
+## Technologies Used
 
-#### UI/UX Enhancements
-- Improved disease identification screen with result displays
-- Added comprehensive mango disease information screen
-- Enhanced visual elements throughout the app
-- Added loading states during image processing
+### Frontend
+- React Native
+- Expo
+- React Navigation
+- i18next (internationalization)
+- AsyncStorage
+- Axios
 
-#### Offline Functionality
-- Local storage for disease identifications
-- Offline capability for image analysis
-- Background synchronization when online
-- Cache for disease information and treatments
+### Backend
+- Flask
+- MongoDB
+- JWT Authentication
+- Flask-Mail for email services
 
-#### Data Collection
-- Disease reporting system with location data
-- Severity classification
-- Environmental conditions reporting
-- Age of tree reporting
+## Setup and Installation
 
-#### User Experience
-- Complete "Mango Disease" screen showing common diseases with detailed information
-- Integrated navigation between identification and reporting
-- Enhanced profile capabilities
-- Added educational content about mango diseases
+### Backend Setup
 
-## Technical Details
+1. Navigate to the backend directory
+   ```
+   cd Sorghum_Disease_Identifier_App/backend
+   ```
 
-### Tech Stack
-- React Native / Expo
-- React Navigation for screen management
-- Async Storage for offline data persistence
-- NetInfo for network connectivity monitoring
-- Expo Image Picker for capturing and selecting images
-- i18n for localization
+2. Install dependencies
+   ```
+   pip install -r requirements.txt
+   ```
 
-### State Management
-- Context API for offline state management
-- Local component state for UI interactions
+3. Create a `.env` file based on the env_sample file
+   - Set up MongoDB connection
+   - Configure email settings
+   - Set JWT secrets
 
-### Data Flow
-1. Users capture or select images of mango plants
-2. Images are processed locally or sent to the backend ML model
-3. Identified diseases are displayed with confidence scores
-4. Users can save results or report diseases with additional information
-5. Data is synced with the server when online
+4. Run the Flask server
+   ```
+   python app.py
+   ```
 
-## Installation
+### Frontend Setup
 
-```bash
-# Clone the repository
-git clone <repository-url>
+1. Navigate to the frontend directory
+   ```
+   cd Sorghum_Disease_Identifier_App/frontend
+   ```
 
-# Install dependencies
-cd Mango_Disease_Identifier_App
-npm install
+2. Install dependencies
+   ```
+   npm install
+   ```
 
-# Start the development server
-npm start
-```
+3. Update the API base URL in `src/services/api.js` to match your backend location
 
-## Backend Requirements
-The app is ready to connect to a backend service that provides:
-- Disease identification API
-- User authentication
-- Data synchronization for offline reports
-- Weather data integration
+4. Run the app
+   ```
+   npm start
+   ```
 
-## Next Steps for Development
-- Create or integrate ML model for disease classification
-- Add user account management with secure storage
-- Implement push notifications for disease outbreaks
-- Add analytics dashboard for tracking disease patterns 
+## User Flow
+
+1. **Authentication**:
+   - User registers with email and password
+   - Verification code sent to email
+   - User verifies account with OTP
+   - User can log in with verified credentials
+
+2. **Main Application**:
+   - Home screen with recent reports and quick access to features
+   - Identification screen for capturing or uploading images
+   - Disease information library
+   - Report history and statistics
+   - User profile management
+
+## Data Security
+
+- Passwords are hashed using bcrypt
+- JWT tokens for authentication
+- Email verification for new accounts
+- OTP expiry for security
+- HTTPS recommended for production
+
+## Deployment Considerations
+
+- Use a production-ready web server like Gunicorn for the backend
+- Configure MongoDB with proper authentication
+- Set up HTTPS for all API communication
+- Use environment variables for sensitive information
+- Consider containerization with Docker for easier deployment
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
