@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthService } from '../services/api';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { AuthService } from "../services/api";
 
 // Create Authentication Context
 const AuthContext = createContext();
@@ -13,11 +13,27 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUserAuthentication = async () => {
       try {
-        const storedUserData = await AsyncStorage.getItem('userData');
-        if (storedUserData) {
+        // First check if we just verified
+        const justVerified = await AsyncStorage.getItem("justVerified");
+        if (justVerified === "true") {
+          // Ensure we're not authenticated
+          setCurrentUser(null);
+          await AsyncStorage.multiRemove([
+            "userData",
+            "auth_token",
+            "justVerified",
+          ]);
+          setIsLoading(false);
+          return;
+        }
+
+        const storedUserData = await AsyncStorage.getItem("userData");
+        const authToken = await AsyncStorage.getItem("auth_token");
+
+        if (storedUserData && authToken) {
           const userData = JSON.parse(storedUserData);
           setCurrentUser(userData);
-          
+
           // Optionally refresh user data from API
           try {
             const response = await AuthService.getCurrentUser();
@@ -25,17 +41,33 @@ export const AuthProvider = ({ children }) => {
               // Update with latest data but keep auth state
               const updatedUser = {
                 ...response.user,
-                isAuthenticated: true
+                isAuthenticated: true,
               };
               setCurrentUser(updatedUser);
-              await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
+              await AsyncStorage.setItem(
+                "userData",
+                JSON.stringify(updatedUser)
+              );
             }
           } catch (error) {
-            console.error('Failed to refresh user data:', error);
+            // If there's an error, clear the authentication
+            setCurrentUser(null);
+            await AsyncStorage.removeItem("userData");
+            await AsyncStorage.removeItem("auth_token");
+            console.error("Failed to refresh user data:", error);
           }
+        } else {
+          // Clear authentication if either token or user data is missing
+          setCurrentUser(null);
+          await AsyncStorage.removeItem("userData");
+          await AsyncStorage.removeItem("auth_token");
         }
       } catch (error) {
-        console.error('Failed to load user data:', error);
+        console.error("Failed to load user data:", error);
+        // Clear authentication on error
+        setCurrentUser(null);
+        await AsyncStorage.removeItem("userData");
+        await AsyncStorage.removeItem("auth_token");
       } finally {
         setIsLoading(false);
       }
@@ -47,53 +79,58 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async (name, email, password) => {
     setIsLoading(true);
-    console.log('AuthContext: Starting registration process', { name, email });
+    console.log("AuthContext: Starting registration process", { name, email });
     try {
-      console.log('AuthContext: Calling AuthService.signUp');
+      console.log("AuthContext: Calling AuthService.signUp");
       const response = await AuthService.signUp(email, password, name);
-      console.log('AuthContext: Registration response', response);
-      
+      console.log("AuthContext: Registration response", response);
+
       // Store the email temporarily for the OTP screen
-      await AsyncStorage.setItem('pendingOtpEmail', email);
-      console.log('AuthContext: Stored email for OTP verification');
-      
+      await AsyncStorage.setItem("pendingOtpEmail", email);
+      console.log("AuthContext: Stored email for OTP verification");
+
       return { success: true };
     } catch (error) {
-      console.error('AuthContext: Registration failed:', error);
-      return { success: false, error: error.message || 'Registration failed' };
+      console.error("AuthContext: Registration failed:", error);
+      return { success: false, error: error.message || "Registration failed" };
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   // Verify OTP function
   const verifyOTP = async (email, otp) => {
     setIsLoading(true);
-    console.log('AuthContext: Starting OTP verification', { email, otp });
+    console.log("AuthContext: Starting OTP verification", { email, otp });
     try {
-      console.log('AuthContext: Calling verifyOTP API');
+      console.log("AuthContext: Calling verifyOTP API");
       const response = await AuthService.verifyOTP(email, otp);
-      console.log('AuthContext: OTP verification response', response);
-      
+      console.log("AuthContext: OTP verification response", response);
+
       if (response.success) {
-        console.log('AuthContext: OTP verification successful');
-        
-        // We no longer automatically set the user as authenticated
-        // User must log in explicitly after verification
-        
-        // Clear any pending OTP email since verification is complete
-        await AsyncStorage.removeItem('pendingOtpEmail');
-        await AsyncStorage.removeItem('pendingOtpTimestamp');
+        console.log("AuthContext: OTP verification successful");
+
+        // Clear ALL authentication data and set user to null
+        setCurrentUser(null);
+        await AsyncStorage.multiRemove([
+          "userData",
+          "auth_token",
+          "pendingOtpEmail",
+          "pendingOtpTimestamp",
+        ]);
+
+        // Set flag to indicate just verified
+        await AsyncStorage.setItem("justVerified", "true");
       }
-      
-      return { 
-        success: response.success, 
+
+      return {
+        success: response.success,
         message: response.message,
-        user: response.user
+        user: response.user,
       };
     } catch (error) {
-      console.error('AuthContext: OTP verification failed:', error);
-      return { success: false, error: error.message || 'Verification failed' };
+      console.error("AuthContext: OTP verification failed:", error);
+      return { success: false, error: error.message || "Verification failed" };
     } finally {
       setIsLoading(false);
     }
@@ -104,29 +141,29 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await AuthService.login(email, password);
-      
+
       if (response.success) {
         // Update user state
         setCurrentUser({
           id: response.user.id,
           email: response.user.email,
           name: response.user.name,
-          isAuthenticated: true
+          isAuthenticated: true,
         });
-        
+
         return { success: true };
       } else if (response.requires_verification) {
-        return { 
-          success: false, 
-          error: 'Account not verified', 
-          requires_verification: true 
+        return {
+          success: false,
+          error: "Account not verified",
+          requires_verification: true,
         };
       } else {
         return { success: false, error: response.message };
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      return { success: false, error: error.message || 'Invalid credentials' };
+      console.error("Login failed:", error);
+      return { success: false, error: error.message || "Invalid credentials" };
     } finally {
       setIsLoading(false);
     }
@@ -140,8 +177,8 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(null);
       return { success: true };
     } catch (error) {
-      console.error('Logout failed:', error);
-      return { success: false, error: error.message || 'Logout failed' };
+      console.error("Logout failed:", error);
+      return { success: false, error: error.message || "Logout failed" };
     } finally {
       setIsLoading(false);
     }
@@ -154,8 +191,11 @@ export const AuthProvider = ({ children }) => {
       const response = await AuthService.forgotPassword(email);
       return { success: true };
     } catch (error) {
-      console.error('Password reset failed:', error);
-      return { success: false, error: error.message || 'Password reset failed' };
+      console.error("Password reset failed:", error);
+      return {
+        success: false,
+        error: error.message || "Password reset failed",
+      };
     } finally {
       setIsLoading(false);
     }
@@ -166,31 +206,37 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await AuthService.updateProfile(userData);
-      
+
       if (response.success) {
         // Update local user data
         const updatedUser = { ...currentUser, ...userData };
         setCurrentUser(updatedUser);
-        await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
+        await AsyncStorage.setItem("userData", JSON.stringify(updatedUser));
       }
-      
+
       return { success: response.success };
     } catch (error) {
-      console.error('Profile update failed:', error);
-      return { success: false, error: error.message || 'Profile update failed' };
+      console.error("Profile update failed:", error);
+      return {
+        success: false,
+        error: error.message || "Profile update failed",
+      };
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   // Resend OTP function
   const resendOTP = async (email) => {
     try {
       const response = await AuthService.resendOTP(email);
       return { success: response.success, message: response.message };
     } catch (error) {
-      console.error('Resend OTP failed:', error);
-      return { success: false, error: error.message || 'Failed to resend code' };
+      console.error("Resend OTP failed:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to resend code",
+      };
     }
   };
 
@@ -206,7 +252,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         resetPassword,
         updateProfile,
-        resendOTP
+        resendOTP,
       }}
     >
       {children}
@@ -218,7 +264,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}; 
+};

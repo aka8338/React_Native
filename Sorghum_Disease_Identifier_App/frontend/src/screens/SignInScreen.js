@@ -1,29 +1,29 @@
-import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Image,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Modal,
-  ActivityIndicator,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { useAuth } from "../contexts/AuthContext";
-import { AuthService } from "../services/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignInScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const { login, resetPassword, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [resetPasswordModalVisible, setResetPasswordModalVisible] = useState(false);
+  const [resetPasswordModalVisible, setResetPasswordModalVisible] =
+    useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetting, setIsResetting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,42 +33,46 @@ const SignInScreen = ({ navigation }) => {
       Alert.alert("Error", "Please enter your email and password");
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       console.log("SignInScreen: Attempting login with email:", email);
       const result = await login(email, password);
       console.log("SignInScreen: Login result:", result);
-      
+
       if (result.success) {
         console.log("SignInScreen: Login successful, proceeding to main app");
         // Successful login - handled by AuthContext navigation
       } else if (result.requires_verification) {
         console.log("SignInScreen: Account requires verification");
         Alert.alert(
-          "Verification Required", 
+          "Verification Required",
           "Your account is not verified. Please verify your email to continue.",
           [
             {
               text: "Cancel",
-              style: "cancel"
+              style: "cancel",
             },
             {
               text: "Verify Now",
               onPress: () => {
                 // Store email for OTP screen
-                AsyncStorage.setItem('pendingOtpEmail', email);
-                AsyncStorage.setItem('pendingOtpTimestamp', Date.now().toString());
+                AsyncStorage.setItem("pendingOtpEmail", email);
+                AsyncStorage.setItem(
+                  "pendingOtpTimestamp",
+                  Date.now().toString()
+                );
                 navigation.navigate("OTP", { formData: { email } });
-              }
-            }
+              },
+            },
           ]
         );
       } else {
         console.log("SignInScreen: Login failed:", result.error);
         Alert.alert(
-          "Login Failed", 
-          result.error || "Invalid email or password. Please check your credentials and try again."
+          "Login Failed",
+          result.error ||
+            "Invalid email or password. Please check your credentials and try again."
         );
       }
     } catch (error) {
@@ -84,20 +88,23 @@ const SignInScreen = ({ navigation }) => {
       Alert.alert("Error", "Please enter your email address");
       return;
     }
-    
+
     setIsResetting(true);
     try {
       const result = await resetPassword(resetEmail);
-      
+
       if (result.success) {
         setResetPasswordModalVisible(false);
         Alert.alert(
-          "Password Reset Sent", 
+          "Password Reset Sent",
           "We've sent a password reset code to your email. Please check your inbox."
         );
         setResetEmail("");
       } else {
-        Alert.alert("Password Reset Failed", result.error || "Unable to send reset email. Please try again later.");
+        Alert.alert(
+          "Password Reset Failed",
+          result.error || "Unable to send reset email. Please try again later."
+        );
       }
     } catch (error) {
       console.error("Password reset error:", error);
@@ -148,7 +155,7 @@ const SignInScreen = ({ navigation }) => {
             editable={!isLoading && !isSubmitting}
           />
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.forgotPassword}
             onPress={() => setResetPasswordModalVisible(true)}
             disabled={isLoading || isSubmitting}
@@ -159,7 +166,10 @@ const SignInScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.signInButton, (isLoading || isSubmitting) && styles.disabledButton]}
+            style={[
+              styles.signInButton,
+              (isLoading || isSubmitting) && styles.disabledButton,
+            ]}
             onPress={handleSignIn}
             disabled={isLoading || isSubmitting}
           >
@@ -171,10 +181,11 @@ const SignInScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>
-              {t("auth.dontHaveAccount")}
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUp")} disabled={isLoading || isSubmitting}>
+            <Text style={styles.signUpText}>{t("auth.dontHaveAccount")}</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("SignUp")}
+              disabled={isLoading || isSubmitting}
+            >
               <Text style={styles.signUpLink}>{t("auth.signUp")}</Text>
             </TouchableOpacity>
           </View>
@@ -192,11 +203,12 @@ const SignInScreen = ({ navigation }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{t("auth.forgotPassword")}</Text>
-              
+
               <Text style={styles.modalText}>
-                Enter your email address and we'll send you a code to reset your password.
+                Enter your email address and we'll send you a code to reset your
+                password.
               </Text>
-              
+
               <TextInput
                 style={styles.input}
                 placeholder={t("auth.email")}
@@ -206,21 +218,23 @@ const SignInScreen = ({ navigation }) => {
                 autoCapitalize="none"
                 editable={!isResetting}
               />
-              
+
               <View style={styles.modalButtons}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.modalButton, styles.cancelButton]}
                   onPress={() => setResetPasswordModalVisible(false)}
                   disabled={isResetting}
                 >
-                  <Text style={styles.cancelButtonText}>{t("general.cancel")}</Text>
+                  <Text style={styles.cancelButtonText}>
+                    {t("general.cancel")}
+                  </Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={[
-                    styles.modalButton, 
+                    styles.modalButton,
                     styles.submitButton,
-                    isResetting && styles.disabledButton
+                    isResetting && styles.disabledButton,
                   ]}
                   onPress={handlePasswordReset}
                   disabled={isResetting}
@@ -228,7 +242,9 @@ const SignInScreen = ({ navigation }) => {
                   {isResetting ? (
                     <ActivityIndicator color="#fff" size="small" />
                   ) : (
-                    <Text style={styles.submitButtonText}>{t("general.submit")}</Text>
+                    <Text style={styles.submitButtonText}>
+                      {t("general.submit")}
+                    </Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -366,4 +382,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignInScreen; 
+export default SignInScreen;

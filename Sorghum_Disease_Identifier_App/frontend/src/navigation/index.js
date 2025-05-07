@@ -1,21 +1,21 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useRef, useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from "../components/SplashScreen";
+import { useAuth } from "../contexts/AuthContext";
+import DiseaseReportScreen from "../screens/DiseaseReportScreen";
 import HomeScreen from "../screens/HomeScreen";
 import IdentificationScreen from "../screens/IdentificationScreen";
 import MangoDiseasesScreen from "../screens/MangoDiseasesScreen";
 import OTPScreen from "../screens/OTPScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import ReportsScreen from "../screens/ReportsScreen";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
-import DiseaseReportScreen from "../screens/DiseaseReportScreen";
-import ReportsScreen from "../screens/ReportsScreen";
-import { useAuth } from "../contexts/AuthContext";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,32 +24,42 @@ const Tab = createBottomTabNavigator();
 const AuthStack = () => {
   // Get pending OTP email to determine if we should show OTP screen
   const [initialRoute, setInitialRoute] = useState("Splash");
-  
+
   useEffect(() => {
-    const checkPendingOtp = async () => {
+    const checkInitialRoute = async () => {
       try {
-        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
-        console.log('AuthStack: Checking for pending OTP verification');
-        
-        if (pendingOtpEmail) {
-          console.log('AuthStack: Found pending OTP verification, setting initial route to OTP');
+        const justVerified = await AsyncStorage.getItem("justVerified");
+        const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
+        console.log(
+          "AuthStack: Checking for pending OTP verification or just verified status"
+        );
+
+        if (justVerified === "true") {
+          console.log(
+            "AuthStack: User just verified, going directly to SignIn"
+          );
+          await AsyncStorage.removeItem("justVerified");
+          setInitialRoute("Signin");
+        } else if (pendingOtpEmail) {
+          console.log(
+            "AuthStack: Found pending OTP verification, setting initial route to OTP"
+          );
           setInitialRoute("OTP");
         } else {
-          console.log('AuthStack: No pending OTP, using default Splash screen');
+          console.log("AuthStack: No pending OTP, using default Splash screen");
         }
       } catch (error) {
-        console.error('AuthStack: Error checking pending OTP:', error);
+        console.error("AuthStack: Error checking navigation state:", error);
       }
     };
-    
-    checkPendingOtp();
+
+    checkInitialRoute();
   }, []);
 
-  // This component needs to have the right navigator with proper screens
   // Force re-render when initialRoute changes
   const [key, setKey] = useState(0);
   useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, [initialRoute]);
 
   return (
@@ -58,9 +68,7 @@ const AuthStack = () => {
       initialRouteName={initialRoute}
       screenOptions={{
         headerShown: false,
-        // Disable all animation when navigating between auth screens
-        // This prevents flash of splash screen
-        animationEnabled: false
+        animationEnabled: false,
       }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
@@ -74,8 +82,8 @@ const AuthStack = () => {
 // Bottom Tab Navigation
 const TabNavigator = () => {
   // Add translation hook
-  const { t, i18n } = require('react-i18next').useTranslation();
-  const { language } = require('../contexts/LanguageContext').useLanguage();
+  const { t, i18n } = require("react-i18next").useTranslation();
+  const { language } = require("../contexts/LanguageContext").useLanguage();
   const [currentLanguage, setCurrentLanguage] = useState(language);
 
   // Create a more direct link to language changes for better reactivity
@@ -84,26 +92,26 @@ const TabNavigator = () => {
       setCurrentLanguage(language);
     }
   }, [language]);
-  
+
   // Dynamically get labels directly from translations each time
   // This is more reliable across language changes
   const getLabel = (key) => {
-    switch(key) {
-      case 'home':
+    switch (key) {
+      case "home":
         return t("general.home");
-      case 'identify':
+      case "identify":
         return t("identification.identify");
-      case 'diseases':
+      case "diseases":
         return t("diseases.diseases");
-      case 'reports':
+      case "reports":
         return t("reports.diseaseReports");
-      case 'profile':
+      case "profile":
         return t("profile.myProfile");
       default:
         return key;
     }
   };
-  
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -114,61 +122,61 @@ const TabNavigator = () => {
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,
-        }
+        },
       }}
     >
-      <Tab.Screen 
-        name="HomeTab" 
-        component={HomeScreen} 
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeScreen}
         options={{
-          tabBarLabel: getLabel('home'),
+          tabBarLabel: getLabel("home"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="home" color={color} size={size} />
-          )
+          ),
         }}
         key={`home-tab-${currentLanguage}`}
       />
-      <Tab.Screen 
-        name="IdentificationTab" 
-        component={IdentificationScreen} 
+      <Tab.Screen
+        name="IdentificationTab"
+        component={IdentificationScreen}
         options={{
-          tabBarLabel: getLabel('identify'),
+          tabBarLabel: getLabel("identify"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="search" color={color} size={size} />
-          )
+          ),
         }}
         key={`identify-tab-${currentLanguage}`}
       />
-      <Tab.Screen 
-        name="DiseasesTab" 
+      <Tab.Screen
+        name="DiseasesTab"
         component={MangoDiseasesScreen}
         options={{
-          tabBarLabel: getLabel('diseases'),
+          tabBarLabel: getLabel("diseases"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="bug-report" color={color} size={size} />
-          )
+          ),
         }}
         key={`diseases-tab-${currentLanguage}`}
       />
-      <Tab.Screen 
-        name="ReportsTab" 
+      <Tab.Screen
+        name="ReportsTab"
         component={ReportsScreen}
         options={{
-          tabBarLabel: getLabel('reports'),
+          tabBarLabel: getLabel("reports"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="bar-chart" color={color} size={size} />
-          )
+          ),
         }}
         key={`reports-tab-${currentLanguage}`}
       />
-      <Tab.Screen 
-        name="ProfileTab" 
+      <Tab.Screen
+        name="ProfileTab"
         component={ProfileScreen}
         options={{
-          tabBarLabel: getLabel('profile'),
+          tabBarLabel: getLabel("profile"),
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="person" color={color} size={size} />
-          )
+          ),
         }}
         key={`profile-tab-${currentLanguage}`}
       />
@@ -196,35 +204,38 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const navigationRef = useRef(null);
 
-  console.log('AppNavigator initializing - isAuthenticated:', isAuthenticated, 'initialRouteName:', initialRouteName);
-  
+  console.log(
+    "AppNavigator initializing - isAuthenticated:",
+    isAuthenticated,
+    "initialRouteName:",
+    initialRouteName
+  );
+
   // Check for pending OTP - this is critical to avoid splash screen
   const [hasPendingOtp, setHasPendingOtp] = useState(false);
-  
+
   useEffect(() => {
     const checkOtpStatus = async () => {
       try {
-        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
+        const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
         setHasPendingOtp(!!pendingOtpEmail);
       } catch (error) {
-        console.error('Error checking OTP status:', error);
+        console.error("Error checking OTP status:", error);
       }
     };
-    
+
     checkOtpStatus();
   }, []);
 
   // Initial determination of which stack to show
-  let startStack = 'Auth';
-  
-  if (isAuthenticated) {
-    console.log('AppNavigator: User is authenticated, using Main stack');
-    startStack = 'Main';
-  } else if (hasPendingOtp) {
-    console.log('AppNavigator: Pending OTP found, ensuring Auth stack is used');
-    startStack = 'Auth';
+  let startStack = "Auth";
+
+  if (isAuthenticated === true) {
+    console.log("AppNavigator: User is authenticated, using Main stack");
+    startStack = "Signin";
   } else {
-    console.log('AppNavigator: User is not authenticated, using Auth stack');
+    console.log("AppNavigator: User is not authenticated, using Auth stack");
+    startStack = "Auth";
   }
 
   if (isLoading) {
@@ -238,18 +249,18 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer 
+      <NavigationContainer
         ref={navigationRef}
         documentTitle={{
-          formatter: (options, route) => 
-            options?.title ?? route?.name ?? "Sorghum Disease Identifier"
+          formatter: (options, route) =>
+            options?.title ?? route?.name ?? "Sorghum Disease Identifier",
         }}
       >
-        <Stack.Navigator 
+        <Stack.Navigator
           initialRouteName={startStack}
           screenOptions={{
             headerShown: false,
-            presentation: 'card',
+            presentation: "card",
             animationEnabled: true,
           }}
         >
