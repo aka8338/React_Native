@@ -8,7 +8,7 @@ import { Platform } from "react-native";
 // For physical devices: Use your development machine's actual IP address
 const getBaseUrl = () => {
   // Replace with your computer's IP address when testing on physical devices
-  const DEVELOPMENT_MACHINE_IP = "localhost"; // Using localhost for local development
+  const DEVELOPMENT_MACHINE_IP = "192.168.165.165"; // Using your machine's IP address
 
   if (__DEV__) {
     if (Platform.OS === "android") {

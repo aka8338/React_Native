@@ -28,19 +28,10 @@ const AuthStack = () => {
   useEffect(() => {
     const checkInitialRoute = async () => {
       try {
-        const justVerified = await AsyncStorage.getItem("justVerified");
         const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
-        console.log(
-          "AuthStack: Checking for pending OTP verification or just verified status"
-        );
+        console.log("AuthStack: Checking for pending OTP verification");
 
-        if (justVerified === "true") {
-          console.log(
-            "AuthStack: User just verified, going directly to SignIn"
-          );
-          await AsyncStorage.removeItem("justVerified");
-          setInitialRoute("Signin");
-        } else if (pendingOtpEmail) {
+        if (pendingOtpEmail) {
           console.log(
             "AuthStack: Found pending OTP verification, setting initial route to OTP"
           );
@@ -74,7 +65,7 @@ const AuthStack = () => {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="OTP" component={OTPScreen} />
-      <Stack.Screen name="Signin" component={SignInScreen} />
+      <Stack.Screen name="SignIn" component={SignInScreen} />
     </Stack.Navigator>
   );
 };
@@ -232,7 +223,7 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
 
   if (isAuthenticated === true) {
     console.log("AppNavigator: User is authenticated, using Main stack");
-    startStack = "Signin";
+    startStack = "Main";
   } else {
     console.log("AppNavigator: User is not authenticated, using Auth stack");
     startStack = "Auth";

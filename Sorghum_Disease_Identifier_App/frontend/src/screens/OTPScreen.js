@@ -43,7 +43,7 @@ const OTPScreen = ({ route, navigation }) => {
                   AsyncStorage.removeItem("pendingOtpTimestamp");
 
                   // Go to Sign In instead of back to Sign Up - prevents splash screen
-                  navigation.replace("Signin");
+                  navigation.reset({ index: 0, routes: [{ name: "SignIn" }] });
                 },
               },
             ]
@@ -90,8 +90,9 @@ const OTPScreen = ({ route, navigation }) => {
           console.error("OTP Screen - Could not determine email address");
           Alert.alert("Error", "Could not determine your email address", [
             {
-              text: "Go Back",
-              onPress: () => navigation.replace("Signin"), // Go to SignIn rather than back to ensure no splash screen
+              text: "OK",
+              onPress: () =>
+                navigation.reset({ index: 0, routes: [{ name: "SignIn" }] }),
             },
           ]);
         }
@@ -100,7 +101,13 @@ const OTPScreen = ({ route, navigation }) => {
         Alert.alert(
           "Error",
           "Failed to set up verification. Please try again.",
-          [{ text: "OK", onPress: () => navigation.replace("Signin") }]
+          [
+            {
+              text: "OK",
+              onPress: () =>
+                navigation.reset({ index: 0, routes: [{ name: "SignIn" }] }),
+            },
+          ]
         );
       }
     };
@@ -150,9 +157,6 @@ const OTPScreen = ({ route, navigation }) => {
             "userData",
           ]);
 
-          // Set verified flag
-          await AsyncStorage.setItem("justVerified", "true");
-
           // Show success message and navigate
           Alert.alert(
             "Success",
@@ -161,10 +165,9 @@ const OTPScreen = ({ route, navigation }) => {
               {
                 text: "Continue",
                 onPress: () => {
-                  // Force navigation to Signin and clear stack
                   navigation.reset({
                     index: 0,
-                    routes: [{ name: "Signin" }],
+                    routes: [{ name: "SignIn" }],
                   });
                 },
               },
@@ -201,7 +204,7 @@ const OTPScreen = ({ route, navigation }) => {
           onPress: () => {
             AsyncStorage.removeItem("pendingOtpEmail");
             AsyncStorage.removeItem("pendingOtpTimestamp");
-            navigation.replace("Signin");
+            navigation.reset({ index: 0, routes: [{ name: "SignIn" }] });
           },
         },
       ]

@@ -1,19 +1,18 @@
-import React, { useEffect, useState, useRef } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
+  FlatList,
   Image,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Modal,
-  FlatList,
-  Platform
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { changeLanguage } from "../i18n";
-import { MaterialIcons } from "@expo/vector-icons";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -24,10 +23,10 @@ const SplashScreen = ({ navigation }) => {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   const languages = [
-    { code: 'en', name: 'English', localName: 'English' },
-    { code: 'am', name: 'Amharic', localName: 'አማርኛ' },
-    { code: 'or', name: 'Oromo', localName: 'Afaan Oromoo' },
-    { code: 'ti', name: 'Tigrinya', localName: 'ትግርኛ' }
+    { code: "en", name: "English", localName: "English" },
+    { code: "am", name: "Amharic", localName: "አማርኛ" },
+    { code: "or", name: "Oromo", localName: "Afaan Oromoo" },
+    { code: "ti", name: "Tigrinya", localName: "ትግርኛ" },
   ];
 
   const pages = [
@@ -55,7 +54,7 @@ const SplashScreen = ({ navigation }) => {
     if (currentPage < pages.length - 1) {
       setCurrentPage(currentPage + 1);
       setWordIndex(0);
-    } 
+    }
   };
 
   const handleBack = () => {
@@ -111,17 +110,19 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const checkPendingOtp = async () => {
       try {
-        const pendingOtpEmail = await AsyncStorage.getItem('pendingOtpEmail');
+        const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
         if (pendingOtpEmail) {
-          console.log('SplashScreen: Found pending OTP verification, navigating to OTP screen');
-          navigation.navigate('OTP');
+          console.log(
+            "SplashScreen: Found pending OTP verification, navigating to OTP screen"
+          );
+          navigation.navigate("OTP");
           return;
         }
       } catch (error) {
-        console.error('SplashScreen: Error checking pending OTP:', error);
+        console.error("SplashScreen: Error checking pending OTP:", error);
       }
     };
-    
+
     checkPendingOtp();
   }, [navigation]);
 
@@ -137,7 +138,12 @@ const SplashScreen = ({ navigation }) => {
       style={styles.languageItem}
       onPress={() => handleLanguageChange(item.code)}
     >
-      <Text style={[styles.languageItemText, i18n.language === item.code && styles.selectedLanguageText]}>
+      <Text
+        style={[
+          styles.languageItemText,
+          i18n.language === item.code && styles.selectedLanguageText,
+        ]}
+      >
         {item.localName}
       </Text>
       {i18n.language === item.code && (
@@ -149,13 +155,14 @@ const SplashScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Language Switcher */}
-      <TouchableOpacity 
-        style={styles.languageButton} 
+      <TouchableOpacity
+        style={styles.languageButton}
         onPress={() => setShowLanguageModal(true)}
       >
         <MaterialIcons name="language" size={24} color="#148F55" />
         <Text style={styles.languageButtonText}>
-          {languages.find(lang => lang.code === i18n.language)?.localName || 'Language'}
+          {languages.find((lang) => lang.code === i18n.language)?.localName ||
+            "Language"}
         </Text>
         <MaterialIcons name="arrow-drop-down" size={24} color="#148F55" />
       </TouchableOpacity>
@@ -168,7 +175,7 @@ const SplashScreen = ({ navigation }) => {
           animationType="fade"
           onRequestClose={() => setShowLanguageModal(false)}
         >
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.modalOverlay}
             activeOpacity={1}
             onPress={() => setShowLanguageModal(false)}
@@ -190,7 +197,11 @@ const SplashScreen = ({ navigation }) => {
         {words.slice(0, wordIndex).join(" ")}
       </Animated.Text>
 
-      <Image source={pages[currentPage].image} style={styles.image} resizeMode="cover" />
+      <Image
+        source={pages[currentPage].image}
+        style={styles.image}
+        resizeMode="cover"
+      />
 
       {/* Caption Below Image */}
       <Text style={styles.captionText}>{pages[currentPage].caption}</Text>
@@ -208,14 +219,14 @@ const SplashScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => navigation.navigate("Signin")}
+            onPress={() => navigation.navigate("SignIn")}
           >
             <Text style={styles.loginText}>{t("auth.login")}</Text>
           </TouchableOpacity>
         </View>
       )}
 
-<View style={styles.footer}>
+      <View style={styles.footer}>
         {currentPage > 0 && (
           <TouchableOpacity onPress={handleBack}>
             <Text style={styles.navigationText}>{t("splash.back")}</Text>
@@ -243,7 +254,7 @@ const SplashScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
         {currentPage === pages.length - 1 && <View style={{ width: 28 }} />}
-      </View> 
+      </View>
     </View>
   );
 };
@@ -257,56 +268,56 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   languageButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 40,
     right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     zIndex: 10,
   },
   languageButtonText: {
-    color: '#148F55',
+    color: "#148F55",
     marginLeft: 5,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-start',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    justifyContent: "flex-start",
+    backgroundColor: "rgba(0,0,0,0.2)",
   },
   languageModalContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 90,
     right: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 5,
     elevation: 5,
-    boxShadow: '0px 2px 3.84px rgba(0, 0, 0, 0.25)',
+    boxShadow: "0px 2px 3.84px rgba(0, 0, 0, 0.25)",
   },
   languageItem: {
     paddingVertical: 12,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
     minWidth: 150,
   },
   languageItemText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginRight: 10,
   },
   selectedLanguageText: {
-    color: '#148F55',
-    fontWeight: 'bold',
+    color: "#148F55",
+    fontWeight: "bold",
   },
   text: {
     textAlign: "center",
