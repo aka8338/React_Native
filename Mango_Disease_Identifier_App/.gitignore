@@ -1,0 +1,169 @@
+# Root level .gitignore for Mango Disease Identifier App
+
+# === GENERAL ===
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime*
+.vs/
+*.code-workspace
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === PYTHON / BACKEND ===
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+myenv/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Flask
+instance/
+.webassets-cache
+
+# ML specific
+history.pkl
+model-checkpoints/
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# === JAVASCRIPT / FRONTEND ===
+# Dependencies
+node_modules/
+npm-packages-offline-cache/
+.pnp
+.pnp.js
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+dist/
+expo-env.d.ts
+
+# Native builds
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.keystore
+
+# Metro bundler
+.metro-health-check*
+.metro/
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+jest-results/
+
+# === ANDROID ===
+# Android builds and gradle
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/app/release/
+android/keys/
+android/*.hprof
+android/.cxx/
+
+# === iOS ===
+ios/build/
+ios/Pods/
+ios/Podfile.lock
+ios/*.xcworkspace
+ios/*.xcodeproj
+
+# === LARGE FILES ===
+# Image datasets (only include in README)
+**/dataset/**/*.jpg
+**/dataset/**/*.jpeg
+**/dataset/**/*.png
+# Except for test/sample images needed for README
+!**/samples/*.jpg
+!**/samples/*.jpeg
+!**/samples/*.png
+
+# Large binary files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.tgz
+*.mp4
+*.mov
+
+# Specific large ML model files (comment out if you need to include these)
+# model/*.h5
+# model/*.keras
+
+# Keep .gitkeep files
+!**/.gitkeep 
