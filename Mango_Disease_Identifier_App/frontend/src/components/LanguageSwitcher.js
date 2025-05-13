@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
   FlatList,
-  Platform
-} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useTranslation } from 'react-i18next';
-import { useLanguage, LANGUAGES } from '../contexts/LanguageContext';
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { LANGUAGES, useLanguage } from "../contexts/LanguageContext";
 
 const LanguageSwitcher = ({ style }) => {
   const { t, i18n } = useTranslation();
@@ -26,10 +25,10 @@ const LanguageSwitcher = ({ style }) => {
   }, []);
 
   const languages = [
-    { code: LANGUAGES.ENGLISH, name: 'English', localName: 'English' },
-    { code: LANGUAGES.AMHARIC, name: 'Amharic', localName: 'አማርኛ' },
-    { code: LANGUAGES.OROMO, name: 'Oromo', localName: 'Afaan Oromoo' },
-    { code: LANGUAGES.TIGRINYA, name: 'Tigrinya', localName: 'ትግርኛ' },
+    { code: LANGUAGES.ENGLISH, name: "English", localName: "English" },
+    { code: LANGUAGES.AMHARIC, name: "Amharic", localName: "አማርኛ" },
+    { code: LANGUAGES.OROMO, name: "Oromo", localName: "Afaan Oromoo" },
+    { code: LANGUAGES.TIGRINYA, name: "Tigrinya", localName: "ትግርኛ" },
   ];
 
   const handleLanguageChange = (langCode) => {
@@ -65,7 +64,7 @@ const LanguageSwitcher = ({ style }) => {
         <MaterialIcons name="language" size={20} color="#148F55" />
         <Text style={styles.languageButtonText}>
           {languages.find((lang) => lang.code === language)?.localName ||
-            t('profile.language')}
+            t("profile.language")}
         </Text>
         <MaterialIcons name="arrow-drop-down" size={20} color="#148F55" />
       </TouchableOpacity>
@@ -99,65 +98,65 @@ const LanguageSwitcher = ({ style }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     top: 20,
     right: 15,
     zIndex: 100,
   },
   languageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
   languageButtonText: {
-    color: '#148F55',
+    color: "#148F55",
     marginLeft: 5,
     marginRight: 2,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 14,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-start',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    justifyContent: "flex-start",
+    backgroundColor: "rgba(0,0,0,0.2)",
   },
   languageModalContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 5,
     elevation: 5,
-    boxShadow: '0px 2px 3.84px rgba(0, 0, 0, 0.25)',
+    boxShadow: "0px 2px 3.84px rgba(0, 0, 0, 0.25)",
   },
   languageItem: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
     minWidth: 150,
   },
   languageItemText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginRight: 10,
   },
   selectedLanguageText: {
-    color: '#148F55',
-    fontWeight: 'bold',
+    color: "#148F55",
+    fontWeight: "bold",
   },
 });
 
-export default LanguageSwitcher; 
+export default LanguageSwitcher;
