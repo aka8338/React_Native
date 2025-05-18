@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -133,7 +133,7 @@ const IdentificationScreen = ({ navigation }) => {
     <ScreenWithFooter navigation={navigation}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <ImageBackground
-          source={require("../assets/background-image.png")}
+          source={require("../assets/background-light.png")}
           style={styles.background}
         >
           <View style={styles.container}>

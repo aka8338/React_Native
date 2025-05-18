@@ -132,7 +132,7 @@ print("Project Root:", PROJECT_ROOT)
 
 # Define categories directly instead of loading from filesystem
 # IMPORTANT: Order must match the original training data order exactly
-categories = ['Anthracnose', 'Die Back', 'Healthy', 'Powdery Mildew', 'Sooty Mould']
+categories = ["Anthracnose", "Die Back", "Healthy", "Non_Mango", "Powdery Mildew", "Sooty Mould"]
 print("Categories:", categories)
 
 # Define disease information dictionary with symptoms and recommendations
@@ -150,22 +150,6 @@ disease_info = {
             'Apply fungicides as preventative treatment',
             'Improve air circulation by proper spacing and pruning',
             'Avoid overhead irrigation to reduce leaf wetness'
-        ],
-        'probability': 0.0  # Will be updated during prediction
-    },
-    'bacterial_canker': {
-        'name': 'Bacterial Canker',
-        'symptoms': [
-            'Water-soaked lesions on leaves and stems',
-            'Cankers on stems and branches',
-            'Bacterial ooze from cankers',
-            'Leaf spots with yellow halos'
-        ],
-        'recommendations': [
-            'Prune and destroy infected branches',
-            'Disinfect pruning tools after each cut',
-            'Apply copper-based bactericides',
-            'Maintain proper plant spacing for air circulation'
         ],
         'probability': 0.0
     },
@@ -201,6 +185,22 @@ disease_info = {
         ],
         'probability': 0.0
     },
+    'non_mango': {
+        'name': 'Not a Mango Image',
+        'symptoms': [
+            'This is not a mango leaf or fruit image',
+            'The system cannot identify diseases in non-mango plants',
+            'The image may be blurry, poorly lit, or showing other objects/plants'
+        ],
+        'recommendations': [
+            'Please take a clear, well-lit picture of a mango leaf or fruit',
+            'Crop the image to show only the mango part you want to analyze',
+            'Ensure the mango leaf or fruit fills most of the frame',
+            'Avoid including other plants or objects in the image',
+            'If using a camera, hold steady and focus on the mango part'
+        ],
+        'probability': 0.0
+    },
     'powdery_mildew': {
         'name': 'Powdery Mildew',
         'symptoms': [
@@ -218,7 +218,7 @@ disease_info = {
         'probability': 0.0
     },
     'sooty_mould': {
-        'name': 'Sooty Mold',
+        'name': 'Sooty Mould',
         'symptoms': [
             'Black, sooty or powdery coating on leaves and stems',
             'Sticky honeydew on plant surfaces',
@@ -236,7 +236,7 @@ disease_info = {
 }
 
 # Load the saved model with normalized path
-model_path = os.path.join(PROJECT_ROOT, 'backend', 'model', 'mango_disease_classifier.keras')
+model_path = os.path.join(PROJECT_ROOT, 'backend', 'model', 'mango_classifier.keras')
 
 try:
     model = tf.keras.models.load_model(model_path)
