@@ -1,13 +1,14 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { CommonActions, NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreen from "../components/SplashScreen";
 import { useAuth } from "../contexts/AuthContext";
 import DiseaseReportScreen from "../screens/DiseaseReportScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import HomeScreen from "../screens/HomeScreen";
 import IdentificationScreen from "../screens/IdentificationScreen";
 import MangoDiseasesScreen from "../screens/MangoDiseasesScreen";
@@ -17,24 +18,170 @@ import ReportsScreen from "../screens/ReportsScreen";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 
+// Create a navigation reference we can use outside of components
+export const navigationRef = React.createRef();
+
+// Create a global navigation service
+export const NavigationService = {
+  navigate(name, params) {
+    if (navigationRef.current) {
+      navigationRef.current.navigate(name, params);
+    } else {
+      console.error('NavigationService: Cannot navigate, navigationRef is not set');
+    }
+  },
+  
+  reset(routeName = 'Auth', nestedRoute = null) {
+    if (navigationRef.current) {
+      let routes;
+      
+      // Validate routeName to avoid invalid navigation
+      if (routeName !== 'Auth' && routeName !== 'Main') {
+        console.log(`NavigationService: Invalid routeName '${routeName}', defaulting to 'Auth'`);
+        routeName = 'Auth';
+        nestedRoute = 'SignIn'; // Force SignIn as the safe default
+      }
+      
+      // Validate nestedRoute for Auth stack
+      if (routeName === 'Auth' && nestedRoute) {
+        const validAuthScreens = ['SignIn', 'SignUp', 'OTP', 'ForgotPassword', 'Splash'];
+        if (!validAuthScreens.includes(nestedRoute)) {
+          console.log(`NavigationService: Invalid Auth screen '${nestedRoute}', defaulting to 'SignIn'`);
+          nestedRoute = 'SignIn';
+        }
+      }
+      
+      if (nestedRoute) {
+        // Special handling for Auth stack screens
+        routes = [
+          {
+            name: routeName,
+            state: {
+              routes: [{ name: nestedRoute }],
+              index: 0,
+            },
+          },
+        ];
+      } else {
+        routes = [{ name: routeName }];
+      }
+      
+      navigationRef.current.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes,
+        })
+      );
+    } else {
+      console.error('NavigationService: Cannot reset, navigationRef is not set');
+    }
+  },
+  
+  resetToSignIn() {
+    try {
+      console.log('NavigationService: Attempting to reset to SignIn');
+      
+      // Use the safer reset method we've improved
+      this.reset('Auth', 'SignIn');
+      console.log('NavigationService: Successfully reset to SignIn using improved reset method');
+      
+      // We'll still set the fallback flag as an extra precaution
+      try {
+        AsyncStorage.setItem("fromLogout", "true")
+          .then(() => console.log('NavigationService: Set fromLogout flag as backup'));
+      } catch (e) {
+        console.error('NavigationService: Error setting fromLogout flag', e);
+      }
+    } catch (error) {
+      console.error('NavigationService: Unexpected error in resetToSignIn', error);
+      // Fallback
+      try {
+        AsyncStorage.setItem("fromLogout", "true")
+          .then(() => console.log('NavigationService: Set fromLogout flag as fallback'));
+      } catch (e) {
+        console.error('NavigationService: Critical error - could not set fromLogout flag', e);
+      }
+    }
+  },
+  
+  resetToMain() {
+    this.reset('Main');
+  },
+  
+  goBack() {
+    if (navigationRef.current) {
+      navigationRef.current.goBack();
+    }
+  },
+};
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Separate stacks for authenticated and unauthenticated users
-const AuthStack = () => {
+const AuthStack = ({ route }) => {
+  // Check for forced initial screen from route params
+  const forcedInitialScreen = route?.params?.initialScreen;
+  
   // Get pending OTP email to determine if we should show OTP screen
-  const [initialRoute, setInitialRoute] = useState("Splash");
+  const [initialRoute, setInitialRoute] = useState(
+    forcedInitialScreen === "SignIn" ? "SignIn" : 
+    // Make sure we never try to use 'Main' as an initial route in Auth stack
+    forcedInitialScreen === "Main" ? "SignIn" : "Splash"
+  );
 
   useEffect(() => {
+    // Only check for other conditions if no forced screen
+    if (forcedInitialScreen) {
+      // Make sure Main is never used in Auth stack
+      if (forcedInitialScreen === "Main") {
+        console.log("AuthStack: 'Main' is not a valid screen in Auth stack, using SignIn instead");
+        setInitialRoute("SignIn");
+      } else {
+        console.log("AuthStack: Using forced initial screen:", forcedInitialScreen);
+        setInitialRoute(forcedInitialScreen);
+      }
+      return;
+    }
+    
     const checkInitialRoute = async () => {
       try {
+        // Check if user just verified their account
+        const justVerified = await AsyncStorage.getItem("justVerified");
+        if (justVerified === "true") {
+          console.log("AuthStack: User just verified account, setting initial route to SignIn");
+          setInitialRoute("SignIn");
+          return;
+        }
+        
+        // Check if user just logged out
+        const fromLogout = await AsyncStorage.getItem("fromLogout");
+        if (fromLogout === "true") {
+          console.log("AuthStack: User just logged out, setting initial route to SignIn");
+          // Clear the flag
+          await AsyncStorage.removeItem("fromLogout");
+          setInitialRoute("SignIn");
+          return;
+        }
+        
+        // Check for pending OTP (including password reset)
         const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
+        const pendingPasswordReset = await AsyncStorage.getItem("pendingPasswordReset");
+        
         console.log("AuthStack: Checking for pending OTP verification");
+        console.log("AuthStack: pendingOtpEmail:", pendingOtpEmail);
+        console.log("AuthStack: pendingPasswordReset:", pendingPasswordReset);
 
         if (pendingOtpEmail) {
           console.log(
             "AuthStack: Found pending OTP verification, setting initial route to OTP"
           );
+          
+          // For password reset flows, make sure we have the right params
+          if (pendingPasswordReset === "true") {
+            console.log("AuthStack: This is a password reset flow");
+          }
+          
           setInitialRoute("OTP");
         } else {
           console.log("AuthStack: No pending OTP, using default Splash screen");
@@ -59,13 +206,17 @@ const AuthStack = () => {
       initialRouteName={initialRoute}
       screenOptions={{
         headerShown: false,
-        animationEnabled: false,
+        animationEnabled: true,
+        cardStyle: { opacity: 1 },
+        presentation: "card",
+        animationTypeForReplace: "push",
       }}
     >
-      <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="OTP" component={OTPScreen} />
-      <Stack.Screen name="SignIn" component={SignInScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="Splash" component={SplashScreen} />
     </Stack.Navigator>
   );
 };
@@ -193,7 +344,6 @@ const MainStack = () => {
 
 const AppNavigator = ({ initialRouteName = "Splash" }) => {
   const { isAuthenticated, isLoading } = useAuth();
-  const navigationRef = useRef(null);
 
   console.log(
     "AppNavigator initializing - isAuthenticated:",
@@ -204,6 +354,9 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
 
   // Check for pending OTP - this is critical to avoid splash screen
   const [hasPendingOtp, setHasPendingOtp] = useState(false);
+  
+  // Track navigation ready state
+  const [isNavigationReady, setNavigationReady] = useState(false);
 
   useEffect(() => {
     const checkOtpStatus = async () => {
@@ -220,6 +373,13 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
 
   // Initial determination of which stack to show
   let startStack = "Auth";
+  
+  // If initialRouteName is "Auth", change it to "SignIn" to avoid navigation issues
+  let actualInitialScreen = initialRouteName;
+  if (initialRouteName === "Auth") {
+    console.log("AppNavigator: 'Auth' is a navigator, not a screen. Using 'SignIn' instead.");
+    actualInitialScreen = "SignIn";
+  }
 
   if (isAuthenticated === true) {
     console.log("AppNavigator: User is authenticated, using Main stack");
@@ -242,9 +402,13 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
     <SafeAreaProvider>
       <NavigationContainer
         ref={navigationRef}
+        onReady={() => {
+          console.log("Navigation container ready");
+          setNavigationReady(true);
+        }}
         documentTitle={{
           formatter: (options, route) =>
-            options?.title ?? route?.name ?? "Sorghum Disease Identifier",
+            options?.title ?? route?.name ?? "Mango Disease Identifier",
         }}
       >
         <Stack.Navigator
@@ -255,7 +419,11 @@ const AppNavigator = ({ initialRouteName = "Splash" }) => {
             animationEnabled: true,
           }}
         >
-          <Stack.Screen name="Auth" component={AuthStack} />
+          <Stack.Screen 
+            name="Auth" 
+            component={AuthStack} 
+            initialParams={{ initialScreen: startStack === "Auth" ? actualInitialScreen : undefined }}
+          />
           <Stack.Screen name="Main" component={MainStack} />
         </Stack.Navigator>
       </NavigationContainer>

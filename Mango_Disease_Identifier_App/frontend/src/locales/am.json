@@ -26,7 +26,17 @@
     "createAccount": "አዲስ አካውንት ፍጠር",
     "alreadyHaveAccount": "አካውንት አለዎት?",
     "dontHaveAccount": "አካውንት የለዎትም?",
-    "login": "ግባ"
+    "login": "ግባ",
+    "forgotPasswordInstructions": "እባክዎ የኢሜይል አድራሻዎን ያስገቡ። የይለፍ ቃልዎን ለመቀየር የማረጋገጫ ኮድ እንልክልዎታለን።",
+    "sendResetLink": "የዳግም ማስጀመሪያ ሊንክ ላክ",
+    "backToLogin": "ወደ መግቢያ ተመለስ",
+    "resetPassword": "የይለፍ ቃል ዳግም አስጀምር",
+    "enterNewPassword": "አዲስ የይለፍ ቃል ያስገቡ",
+    "confirmNewPassword": "አዲስ የይለፍ ቃል ያረጋግጡ",
+    "passwordResetSuccess": "የይለፍ ቃል በተሳካ ሁኔታ ዳግም ተጀምሯል",
+    "resetPasswordFailed": "የይለፍ ቃልን ዳግም ማስጀመር አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
+    "emailRequired": "ኢሜይል ያስፈልጋል",
+    "invalidEmail": "ልክ ያልሆነ የኢሜይል ቅርጸት"
   },
   "otp": {
     "verification": "ማረጋገጫ",

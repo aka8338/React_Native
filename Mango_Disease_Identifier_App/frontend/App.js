@@ -46,15 +46,47 @@ const App = () => {
         // Pre-load fonts, make API calls, etc.
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Check if there's a pending OTP verification - this takes priority
+        // First check for password reset flow - this should take absolute priority
+        const pendingPasswordReset = await AsyncStorage.getItem("pendingPasswordReset");
         const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
-        const pendingOtpTimestamp = await AsyncStorage.getItem(
-          "pendingOtpTimestamp"
-        );
-        console.log("App initialization - Pending OTP email:", pendingOtpEmail);
+        
+        if (pendingPasswordReset === "true" && pendingOtpEmail) {
+          console.log("App initialization - Password reset in progress, going directly to OTP screen");
+          setInitialRouteName("OTP");
+          setAppIsReady(true);
+          return; // Exit early to prevent any other navigation
+        }
+        
+        // Check if user just verified their account - this takes priority
+        const justVerified = await AsyncStorage.getItem("justVerified");
+        if (justVerified === "true") {
+          console.log("App initialization - Account just verified, going directly to SignIn");
+          setInitialRouteName("SignIn");
+          // We'll keep the flag for the SplashScreen to handle the final navigation
+          return;
+        }
+        
+        // Check if user just logged out - also takes priority
+        const fromLogout = await AsyncStorage.getItem("fromLogout");
+        if (fromLogout === "true") {
+          console.log("App initialization - User just logged out, going directly to SignIn");
+          // Clear the flag now that we've used it
+          await AsyncStorage.removeItem("fromLogout");
+          // Don't just set initialRouteName, instead set state to be passed to stack
+          setInitialRouteName("SignIn");
+          // Immediately set app ready to prevent any further delay
+          setAppIsReady(true);
+          return;
+        }
 
-        if (pendingOtpEmail) {
+        // Check if there's a pending OTP verification - this takes priority
+        // We already checked for password reset above, so this is for account verification
+        console.log("App initialization - Pending OTP email:", pendingOtpEmail);
+        console.log("App initialization - Pending password reset:", pendingPasswordReset);
+
+        if (pendingOtpEmail && pendingPasswordReset !== "true") {
           // Check if OTP request is stale (older than 30 minutes)
+          const pendingOtpTimestamp = await AsyncStorage.getItem("pendingOtpTimestamp");
           const now = Date.now();
           const otpTime = parseInt(pendingOtpTimestamp || "0", 10);
           const isStale = now - otpTime > 30 * 60 * 1000; // 30 minutes
@@ -64,14 +96,17 @@ const App = () => {
             console.log(
               "App initialization - Found stale OTP request, cleaning up"
             );
-            await AsyncStorage.removeItem("pendingOtpEmail");
-            await AsyncStorage.removeItem("pendingOtpTimestamp");
+            await AsyncStorage.multiRemove([
+              "pendingOtpEmail", 
+              "pendingOtpTimestamp",
+              "pendingPasswordReset"
+            ]);
           } else {
-            // Valid OTP verification pending, go directly to Auth stack
+            // Valid OTP verification pending, go directly to OTP screen
             console.log(
-              "App initialization - Pending OTP verification detected, setting initial route to Auth"
+              "App initialization - Pending OTP verification detected, setting initial route to OTP"
             );
-            setInitialRouteName("Auth");
+            setInitialRouteName("OTP");
 
             // Reset stored language to English for OTP flow
             try {
@@ -105,19 +140,24 @@ const App = () => {
                 "App initialization - Authenticated user found, setting initial route to Main"
               );
               setInitialRouteName("Main");
+              
+              // Reset any lingering OTP state to prevent navigation issues
+              await AsyncStorage.removeItem("pendingOtpEmail");
+              await AsyncStorage.removeItem("pendingOtpTimestamp");
+              await AsyncStorage.removeItem("pendingPasswordReset");
             } else {
               // User data exists but not authenticated
               console.log(
-                "App initialization - User data found but not authenticated, setting initial route to Auth"
+                "App initialization - User data found but not authenticated, setting initial route to SignIn"
               );
-              setInitialRouteName("Auth");
+              setInitialRouteName("SignIn");
             }
           } catch (parseError) {
             console.error(
               "App initialization - Error parsing user data:",
               parseError
             );
-            setInitialRouteName("Auth");
+            setInitialRouteName("SignIn");
           }
         } else {
           // No user data, go to default splash screen

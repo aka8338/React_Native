@@ -18,10 +18,12 @@ import {
 } from "react-native";
 import ScreenWithFooter from "../components/ScreenWithFooter";
 import { useOffline } from "../contexts/OfflineContext";
+import { useNavigation } from '@react-navigation/native';
 
-const DiseaseReportScreen = ({ navigation, route }) => {
+const DiseaseReportScreen = ({ route }) => {
   const { t } = useTranslation();
   const { isOnline, queueDiseaseReport } = useOffline();
+  const navigation = useNavigation();
 
   // Get identification data if passed from previous screen
   const identificationData = route.params?.identificationData || null;
@@ -59,7 +61,7 @@ const DiseaseReportScreen = ({ navigation, route }) => {
       if (status !== "granted") {
         Alert.alert(
           "Permission Denied",
-          "Permission to access location was denied"
+          "Location permission is required to report disease location."
         );
         setIsLoadingLocation(false);
         return;
@@ -85,7 +87,7 @@ const DiseaseReportScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error("Error getting location:", error);
-      Alert.alert("Error", "Failed to get current location");
+      Alert.alert("Location Error", "Could not get your current location.");
     } finally {
       setIsLoadingLocation(false);
     }
@@ -93,8 +95,8 @@ const DiseaseReportScreen = ({ navigation, route }) => {
 
   // Submit the report
   const handleSubmit = async () => {
-    if (!diseaseName) {
-      Alert.alert("Error", "Please enter a disease name");
+    if (!diseaseName || !severity) {
+      Alert.alert("Error", "Please fill in all required fields.");
       return;
     }
 
@@ -124,8 +126,8 @@ const DiseaseReportScreen = ({ navigation, route }) => {
       Alert.alert(
         "Success",
         isOnline
-          ? t("reporting.submissionSuccess")
-          : t("offline.syncWhenOnline"),
+          ? "Report submitted successfully!"
+          : "Report saved offline and will be synced when online.",
         [
           {
             text: "OK",
@@ -135,16 +137,7 @@ const DiseaseReportScreen = ({ navigation, route }) => {
       );
     } catch (error) {
       console.error("Error submitting report:", error);
-      Alert.alert("Error", t("reporting.submissionFailed"), [
-        {
-          text: t("reporting.tryAgain"),
-          onPress: () => handleSubmit(),
-        },
-        {
-          text: t("general.cancel"),
-          style: "cancel",
-        },
-      ]);
+      Alert.alert("Error", "Failed to submit report. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -163,7 +156,6 @@ const DiseaseReportScreen = ({ navigation, route }) => {
             </Text>
             {!isOnline && (
               <View style={styles.offlineIndicator}>
-                <MaterialIcons name="cloud-off" size={16} color="#fff" />
                 <Text style={styles.offlineText}>
                   {t("offline.offlineMode")}
                 </Text>
@@ -279,7 +271,9 @@ const DiseaseReportScreen = ({ navigation, route }) => {
               {isLoadingLocation ? (
                 <ActivityIndicator size="small" color="#FFF" />
               ) : (
-                <MaterialIcons name="my-location" size={20} color="#FFF" />
+                <Text style={styles.locationButtonText}>
+                  {t("reporting.useCurrentLocation")}
+                </Text>
               )}
             </TouchableOpacity>
           </View>
@@ -390,6 +384,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
+  },
+  locationButtonText: {
+    color: "#FFF",
+    fontSize: 12,
   },
   submitButton: {
     backgroundColor: "#148F55",

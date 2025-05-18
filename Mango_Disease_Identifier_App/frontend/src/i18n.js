@@ -21,7 +21,7 @@ i18n.use(initReactI18next).init({
       translation: ti
     }
   },
-  lng: "am", // Changed default language to Amharic
+  lng: "en", // Changed default language to English
   fallbackLng: "en",
   interpolation: {
     escapeValue: false, // react already safes from xss

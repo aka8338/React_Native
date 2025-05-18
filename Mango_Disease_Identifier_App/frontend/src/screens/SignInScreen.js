@@ -157,7 +157,7 @@ const SignInScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.forgotPassword}
-            onPress={() => setResetPasswordModalVisible(true)}
+            onPress={() => navigation.navigate("ForgotPassword")}
             disabled={isLoading || isSubmitting}
           >
             <Text style={styles.forgotPasswordText}>

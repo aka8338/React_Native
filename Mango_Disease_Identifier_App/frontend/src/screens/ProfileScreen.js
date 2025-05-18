@@ -19,6 +19,7 @@ import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useAuth } from "../contexts/AuthContext";
 import { useOffline } from "../contexts/OfflineContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NavigationService } from "../navigation";
 
 const ProfileScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -86,11 +87,13 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const confirmLogout = async () => {
+    // Immediately hide the modal
     setLogoutConfirmVisible(false);
-    const result = await logout();
-    if (!result.success) {
-      Alert.alert("Error", result.error || "Logout failed");
-    }
+    
+    // Then logout - navigation will be handled by AuthContext
+    logout().catch(error => {
+      Alert.alert("Error", error.message || "Logout failed");
+    });
   };
 
   const handleClearData = () => {
