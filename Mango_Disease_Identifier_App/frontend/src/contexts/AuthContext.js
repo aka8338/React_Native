@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { AuthService } from "../services/api";
+import { NavigationService } from "../navigation";
 
 // Create Authentication Context
 const AuthContext = createContext();
@@ -99,28 +100,41 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Verify OTP function
-  const verifyOTP = async (email, otp) => {
+  const verifyOTP = async (email, otp, isPasswordReset = false) => {
     setIsLoading(true);
-    console.log("AuthContext: Starting OTP verification", { email, otp });
+    console.log("AuthContext: Starting OTP verification", { email, otp, isPasswordReset });
     try {
       console.log("AuthContext: Calling verifyOTP API");
+      
+      // For password reset, we may handle this differently
+      // Depending on your API structure
       const response = await AuthService.verifyOTP(email, otp);
       console.log("AuthContext: OTP verification response", response);
 
       if (response.success) {
         console.log("AuthContext: OTP verification successful");
 
-        // Clear ALL authentication data and set user to null
-        setCurrentUser(null);
-        await AsyncStorage.multiRemove([
-          "userData",
-          "auth_token",
-          "pendingOtpEmail",
-          "pendingOtpTimestamp",
-        ]);
+        if (!isPasswordReset) {
+          // For account verification, clear auth data
+          setCurrentUser(null);
+          await AsyncStorage.multiRemove([
+            "userData",
+            "auth_token",
+            "pendingOtpEmail",
+            "pendingOtpTimestamp",
+          ]);
 
-        // Set flag to indicate just verified
-        await AsyncStorage.setItem("justVerified", "true");
+          // Set flag to indicate just verified - this will be used by the SplashScreen
+          // to navigate directly to SignIn
+          await AsyncStorage.setItem("justVerified", "true");
+          console.log("AuthContext: Set justVerified flag to redirect to SignIn");
+          
+          // Direct navigation to SignIn (after a slight delay to allow state to update)
+          setTimeout(() => {
+            NavigationService.resetToSignIn();
+          }, 100);
+        }
+        // For password reset, we keep pendingOtpEmail for the reset phase
       }
 
       return {
@@ -143,6 +157,16 @@ export const AuthProvider = ({ children }) => {
       const response = await AuthService.login(email, password);
 
       if (response.success) {
+        // Clear any pending OTP or reset flags to prevent navigation issues
+        await AsyncStorage.multiRemove([
+          "pendingOtpEmail",
+          "pendingOtpTimestamp",
+          "pendingPasswordReset",
+          "justVerified",
+          "fromLogout"
+        ]);
+        console.log("AuthContext: Cleared all pending verification flags on login");
+        
         // Update user state
         setCurrentUser({
           id: response.user.id,
@@ -150,6 +174,13 @@ export const AuthProvider = ({ children }) => {
           name: response.user.name,
           isAuthenticated: true,
         });
+        
+        console.log("AuthContext: User authenticated, navigating to Main");
+
+        // Direct navigation to Main screen
+        setTimeout(() => {
+          NavigationService.resetToMain();
+        }, 100);
 
         return { success: true };
       } else if (response.requires_verification) {
@@ -173,11 +204,47 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await AuthService.logout();
+      console.log("AuthContext: Starting logout process");
+      
+      // First - mark that we're logging out by setting the flag
+      // This will help other components know to redirect properly
+      await AsyncStorage.setItem("fromLogout", "true");
+      console.log("AuthContext: Set fromLogout flag");
+      
+      // Second - clean up all auth and OTP related data in storage
+      await AsyncStorage.multiRemove([
+        "auth_token",
+        "userData",
+        "pendingOtpEmail",
+        "pendingOtpTimestamp",
+        "pendingPasswordReset",
+        "justVerified"
+      ]);
+      console.log("AuthContext: Cleared all auth data");
+      
+      // Then set user to null to trigger auth state change
       setCurrentUser(null);
+      console.log("AuthContext: Set currentUser to null");
+      
+      // Add a delay before navigation to ensure auth state is fully updated
+      // A longer delay here helps ensure state changes have propagated
+      setTimeout(() => {
+        console.log("AuthContext: Timeout completed, navigating to SignIn");
+        NavigationService.resetToSignIn();
+      }, 300);
+      
       return { success: true };
     } catch (error) {
       console.error("Logout failed:", error);
+      
+      // Even if we hit an error, try to set the fromLogout flag as a safety
+      try {
+        await AsyncStorage.setItem("fromLogout", "true");
+        setCurrentUser(null); // Still try to clear current user
+      } catch (e) {
+        console.error("Critical error setting fromLogout flag:", e);
+      }
+      
       return { success: false, error: error.message || "Logout failed" };
     } finally {
       setIsLoading(false);
@@ -189,12 +256,61 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await AuthService.forgotPassword(email);
-      return { success: true };
+      return { 
+        success: response.success,
+        message: response.message || "Password reset instructions sent to your email"
+      };
     } catch (error) {
       console.error("Password reset failed:", error);
       return {
         success: false,
         error: error.message || "Password reset failed",
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Confirm password reset with OTP and new password
+  const confirmPasswordReset = async (email, otp, newPassword) => {
+    setIsLoading(true);
+    try {
+      const response = await AuthService.resetPassword(email, otp, newPassword);
+      
+      if (response.success) {
+        console.log("AuthContext: Password reset successful");
+        
+        // Clear all verification-related data first
+        await AsyncStorage.multiRemove([
+          "pendingOtpEmail",
+          "pendingOtpTimestamp",
+          "pendingPasswordReset",
+        ]);
+        
+        // Set justVerified flag for navigation
+        await AsyncStorage.setItem("justVerified", "true");
+        
+        // This flag will be checked in SignInScreen to show a success message
+        await AsyncStorage.setItem("passwordResetSuccess", "true");
+        
+        console.log("AuthContext: Password reset flags cleared, justVerified flag set");
+        
+        // Add a delay before navigation to ensure state changes have propagated
+        setTimeout(() => {
+          console.log("AuthContext: Navigating to SignIn after password reset");
+          NavigationService.resetToSignIn();
+        }, 300);
+      }
+      
+      return { 
+        success: response.success,
+        message: response.message || "Password has been reset successfully"
+      };
+    } catch (error) {
+      console.error("Password reset confirmation failed:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to reset password",
       };
     } finally {
       setIsLoading(false);
@@ -251,6 +367,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         resetPassword,
+        confirmPasswordReset,
         updateProfile,
         resendOTP,
       }}

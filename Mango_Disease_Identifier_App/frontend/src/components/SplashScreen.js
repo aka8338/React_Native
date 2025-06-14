@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { changeLanguage } from "../i18n";
+import { NavigationService } from "../navigation";
 
 const SplashScreen = ({ navigation }) => {
   const { t, i18n } = useTranslation();
@@ -110,19 +111,50 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const checkPendingOtp = async () => {
       try {
+        // First check if user just logged out - this takes priority
+        const fromLogout = await AsyncStorage.getItem("fromLogout");
+        if (fromLogout === "true") {
+          console.log("SplashScreen: User just logged out, immediately replacing with SignIn");
+          // Clear the flag
+          await AsyncStorage.removeItem("fromLogout");
+          // Use immediate replacement to skip any animations
+          navigation.replace("SignIn");
+          return;
+        }
+        
+        // Check if user just verified their account
+        const justVerified = await AsyncStorage.getItem("justVerified");
+        if (justVerified === "true") {
+          console.log("SplashScreen: User just verified account, immediately replacing with SignIn");
+          // Clear the flag
+          await AsyncStorage.removeItem("justVerified");
+          // Use immediate replacement for instant transition
+          navigation.replace("SignIn");
+          return;
+        }
+        
+        // Otherwise check for pending OTP
         const pendingOtpEmail = await AsyncStorage.getItem("pendingOtpEmail");
+        const pendingPasswordReset = await AsyncStorage.getItem("pendingPasswordReset");
         if (pendingOtpEmail) {
           console.log(
-            "SplashScreen: Found pending OTP verification, navigating to OTP screen"
+            "SplashScreen: Found pending OTP verification, immediately replacing with OTP screen"
           );
-          navigation.navigate("OTP");
+          // Set a navigation key to force fresh rendering
+          const otpParams = pendingPasswordReset === "true" 
+            ? { fromPasswordReset: true, email: pendingOtpEmail } 
+            : undefined;
+          
+          // Use immediate replacement for instant transition
+          navigation.replace("OTP", otpParams);
           return;
         }
       } catch (error) {
         console.error("SplashScreen: Error checking pending OTP:", error);
       }
     };
-
+    
+    // Run this check immediately on mount with minimal delay
     checkPendingOtp();
   }, [navigation]);
 

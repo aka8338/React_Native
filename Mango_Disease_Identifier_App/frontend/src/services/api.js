@@ -168,32 +168,52 @@ export const AuthService = {
 
   forgotPassword: async (email) => {
     try {
+      console.log("API: Sending forgot password request for email:", email);
       const response = await api.post("/auth/forgot-password", { email });
+      console.log("API: Forgot password response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("API: Forgot password error:", error.message);
       throw error.response ? error.response.data : { message: "Network error" };
     }
   },
 
   resetPassword: async (email, otp, newPassword) => {
     try {
+      console.log("API: Sending password reset request for email:", email);
       const response = await api.post("/auth/reset-password", {
         email,
         otp,
         new_password: newPassword,
       });
+      console.log("API: Password reset response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("API: Password reset error:", error.message);
       throw error.response ? error.response.data : { message: "Network error" };
     }
   },
 
   logout: async () => {
     try {
-      await AsyncStorage.removeItem("auth_token");
-      await AsyncStorage.removeItem("userData");
+      console.log("API: Logging out user");
+      // Clear all authentication and session data
+      await AsyncStorage.multiRemove([
+        "auth_token", 
+        "userData", 
+        "pendingOtpEmail",
+        "pendingOtpTimestamp",
+        "pendingPasswordReset",
+        "justVerified"
+      ]);
+      
+      // Set fromLogout flag to ensure proper navigation
+      await AsyncStorage.setItem("fromLogout", "true");
+      
+      console.log("API: All auth data cleared, fromLogout flag set");
       return { success: true };
     } catch (error) {
+      console.error("API: Logout failed:", error);
       throw { message: "Logout failed" };
     }
   },
@@ -204,6 +224,31 @@ export const AuthService = {
       return response.data;
     } catch (error) {
       throw error.response ? error.response.data : { message: "Network error" };
+    }
+  },
+
+  // Helper function to set verification flags for proper navigation
+  setVerificationFlags: async (options = {}) => {
+    try {
+      const { justVerified = false, clearOtpData = false } = options;
+      
+      // Set or clear flags based on options
+      if (justVerified) {
+        await AsyncStorage.setItem("justVerified", "true");
+      }
+      
+      if (clearOtpData) {
+        await AsyncStorage.multiRemove([
+          "pendingOtpEmail",
+          "pendingOtpTimestamp",
+          "pendingPasswordReset"
+        ]);
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error managing verification flags:", error);
+      return { success: false, error: "Failed to manage verification state" };
     }
   },
 };
@@ -317,8 +362,133 @@ export const DiseaseService = {
   },
 };
 
+export const DiseaseReportService = {
+  // Submit a new disease report
+  submitReport: async (report) => {
+    try {
+      console.log('Submitting report to server:', report);
+      
+      const token = await AsyncStorage.getItem("auth_token");
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${BASE_URL}/disease-reports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(report),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Server response:', response.status, errorData);
+        throw new Error(`Server responded with ${response.status}: ${errorData}`);
+      }
+
+      const data = await response.json();
+      console.log('Report submission successful:', data);
+      return data;
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      throw error;
+    }
+  },
+
+  // Get all reports
+  getReports: async () => {
+    try {
+      const token = await AsyncStorage.getItem("auth_token");
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${BASE_URL}/disease-reports`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Server response:', response.status, errorData);
+        throw new Error(`Server responded with ${response.status}: ${errorData}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+      throw error;
+    }
+  },
+
+  // Get a single report by ID
+  getReportById: async (reportId) => {
+    try {
+      const token = await AsyncStorage.getItem("auth_token");
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${BASE_URL}/disease-reports/${reportId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Server response:', response.status, errorData);
+        throw new Error(`Server responded with ${response.status}: ${errorData}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching report:', error);
+      throw error;
+    }
+  },
+
+  // Sync local reports with server
+  syncReports: async (localReports) => {
+    try {
+      const token = await AsyncStorage.getItem("auth_token");
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      console.log('Syncing reports with server:', localReports);
+
+      const response = await fetch(`${BASE_URL}/disease-reports/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(localReports),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Server response:', response.status, errorData);
+        throw new Error(`Server responded with ${response.status}: ${errorData}`);
+      }
+
+      const data = await response.json();
+      console.log('Sync successful:', data);
+      return data;
+    } catch (error) {
+      console.error('Error syncing reports:', error);
+      throw error;
+    }
+  },
+};
+
 export default {
   AuthService,
   UserService,
   DiseaseService,
+  DiseaseReportService,
 };

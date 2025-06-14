@@ -26,7 +26,17 @@
     "createAccount": "Create Account",
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?",
-    "login": "Log in"
+    "login": "Log in",
+    "forgotPasswordInstructions": "Please enter your email address. We will send you a verification code to reset your password.",
+    "sendResetLink": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "resetPassword": "Reset Password",
+    "enterNewPassword": "Enter New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordResetSuccess": "Password reset successfully",
+    "resetPasswordFailed": "Failed to reset password. Please try again.",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Invalid email format"
   },
   "otp": {
     "verification": "Verification",

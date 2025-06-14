@@ -14,9 +14,9 @@ class JSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
-auth_bp = Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__)
 
-@auth_bp.route("/signup", methods=["POST"])
+@auth.route("/signup", methods=["POST"])
 def signup():
     """Register a new user."""
     data = request.get_json()
@@ -57,7 +57,7 @@ def signup():
         "user_id": str(user["_id"])
     }), 201
 
-@auth_bp.route("/verify-otp", methods=["POST"])
+@auth.route("/verify-otp", methods=["POST"])
 def verify_otp():
     """Verify OTP for email verification."""
     data = request.get_json()
@@ -94,7 +94,7 @@ def verify_otp():
         }
     }), 200
 
-@auth_bp.route("/login", methods=["POST"])
+@auth.route("/login", methods=["POST"])
 def login():
     """Login a user."""
     data = request.get_json()
@@ -146,7 +146,7 @@ def login():
         }
     }), 200
 
-@auth_bp.route("/resend-otp", methods=["POST"])
+@auth.route("/resend-otp", methods=["POST"])
 def resend_otp():
     """Resend OTP for email verification."""
     data = request.get_json()
@@ -173,7 +173,7 @@ def resend_otp():
         "message": "Verification code sent to your email"
     }), 200
 
-@auth_bp.route("/forgot-password", methods=["POST"])
+@auth.route("/forgot-password", methods=["POST"])
 def forgot_password():
     """Send password reset OTP."""
     data = request.get_json()
@@ -204,7 +204,7 @@ def forgot_password():
         "message": "If your email is registered, you will receive a password reset code"
     }), 200
 
-@auth_bp.route("/reset-password", methods=["POST"])
+@auth.route("/reset-password", methods=["POST"])
 def reset_password():
     """Reset password with OTP."""
     data = request.get_json()
@@ -233,7 +233,7 @@ def reset_password():
         "message": "Password reset successful"
     }), 200
 
-@auth_bp.route("/me", methods=["GET"])
+@auth.route("/me", methods=["GET"])
 @jwt_required()
 def get_current_user():
     """Get current user profile."""

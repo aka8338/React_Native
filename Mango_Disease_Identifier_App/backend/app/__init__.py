@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from dotenv import load_dotenv
-from pymongo import MongoClient
+from mongoengine import connect
 
 # Load environment variables
 load_dotenv()
@@ -12,10 +12,6 @@ load_dotenv()
 # Initialize Flask extensions
 jwt = JWTManager()
 mail = Mail()
-
-# MongoDB connection
-mongo_client = None
-db = None
 
 def create_app():
     """Initialize the Flask application."""
@@ -28,6 +24,11 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default-jwt-secret-key")
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "default-flask-secret-key")
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 86400  # 24 hours
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'mango_disease_db',
+        'host': 'localhost',
+        'port': 27017
+    }
     
     # Configure email
     app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
@@ -41,18 +42,18 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
     
-    # Initialize MongoDB connection
-    global mongo_client, db
-    mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/sorghum_disease_app")
-    mongo_client = MongoClient(mongo_uri)
-    db = mongo_client.get_database()
+    # Connect to MongoDB using mongoengine
+    connect('mango_disease_db', host='localhost', port=27017)
+    
+    # Import routes after app is created
+    from app.routes.auth_routes import auth
+    from app.routes.user_routes import users
+    from app.routes.disease_reports import disease_reports
     
     # Register blueprints
-    from app.routes.auth_routes import auth_bp
-    from app.routes.user_routes import user_bp
-    
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
-    app.register_blueprint(user_bp, url_prefix="/api/users")
+    app.register_blueprint(auth, url_prefix='/api/auth')
+    app.register_blueprint(users, url_prefix='/api/users')
+    app.register_blueprint(disease_reports, url_prefix='/api/disease-reports')
     
     # Note: The prediction endpoint is registered directly in app.py
     # This creates the Flask app that will host both the API endpoints and the ML model prediction route

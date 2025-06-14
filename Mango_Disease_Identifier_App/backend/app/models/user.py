@@ -1,12 +1,14 @@
 import datetime
 import bcrypt
 from bson import ObjectId
-from app import db
+from app.utils.db import get_db
 
 class User:
     """User model for MongoDB."""
     
-    COLLECTION = db.users
+    @staticmethod
+    def get_collection():
+        return get_db().users
     
     @staticmethod
     def create_user(email, password, name=None):
@@ -24,21 +26,21 @@ class User:
             "last_login": None
         }
         
-        result = User.COLLECTION.insert_one(user)
+        result = User.get_collection().insert_one(user)
         user["_id"] = result.inserted_id
         return user
     
     @staticmethod
     def get_user_by_email(email):
         """Get a user by their email address."""
-        return User.COLLECTION.find_one({"email": email})
+        return User.get_collection().find_one({"email": email})
     
     @staticmethod
     def get_user_by_id(user_id):
         """Get a user by their ID."""
         if isinstance(user_id, str):
             user_id = ObjectId(user_id)
-        return User.COLLECTION.find_one({"_id": user_id})
+        return User.get_collection().find_one({"_id": user_id})
     
     @staticmethod
     def activate_user(user_id):
@@ -46,7 +48,7 @@ class User:
         if isinstance(user_id, str):
             user_id = ObjectId(user_id)
         
-        User.COLLECTION.update_one(
+        User.get_collection().update_one(
             {"_id": user_id},
             {
                 "$set": {
@@ -62,7 +64,7 @@ class User:
         if isinstance(user_id, str):
             user_id = ObjectId(user_id)
         
-        User.COLLECTION.update_one(
+        User.get_collection().update_one(
             {"_id": user_id},
             {
                 "$set": {
@@ -86,7 +88,7 @@ class User:
         if email:
             update_data["email"] = email
         
-        User.COLLECTION.update_one(
+        User.get_collection().update_one(
             {"_id": user_id},
             {"$set": update_data}
         )
@@ -107,7 +109,7 @@ class User:
         
         hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
         
-        User.COLLECTION.update_one(
+        User.get_collection().update_one(
             {"_id": user_id},
             {
                 "$set": {

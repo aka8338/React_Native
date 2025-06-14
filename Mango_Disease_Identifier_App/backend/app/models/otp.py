@@ -1,12 +1,14 @@
 import datetime
 import random
 import os
-from app import db
+from app.utils.db import get_db
 
 class OTP:
     """OTP model for email verification."""
     
-    COLLECTION = db.otps
+    @staticmethod
+    def get_collection():
+        return get_db().otps
     
     @staticmethod
     def generate_otp(length=6):
@@ -21,7 +23,7 @@ class OTP:
     def create_otp(email, purpose="verification"):
         """Create a new OTP for a user."""
         # Delete any existing OTPs for this email and purpose
-        OTP.COLLECTION.delete_many({"email": email, "purpose": purpose})
+        OTP.get_collection().delete_many({"email": email, "purpose": purpose})
         
         # Generate new OTP
         otp_code = OTP.generate_otp()
@@ -36,13 +38,13 @@ class OTP:
             "is_used": False
         }
         
-        OTP.COLLECTION.insert_one(otp_data)
+        OTP.get_collection().insert_one(otp_data)
         return otp_code
     
     @staticmethod
     def verify_otp(email, otp_code, purpose="verification"):
         """Verify an OTP."""
-        otp_data = OTP.COLLECTION.find_one({
+        otp_data = OTP.get_collection().find_one({
             "email": email,
             "code": otp_code,
             "purpose": purpose,
@@ -54,7 +56,7 @@ class OTP:
             return False
         
         # Mark OTP as used
-        OTP.COLLECTION.update_one(
+        OTP.get_collection().update_one(
             {"_id": otp_data["_id"]},
             {"$set": {"is_used": True}}
         )
@@ -64,7 +66,7 @@ class OTP:
     @staticmethod
     def cleanup_expired_otps():
         """Clean up expired OTPs."""
-        OTP.COLLECTION.delete_many({
+        OTP.get_collection().delete_many({
             "$or": [
                 {"expires_at": {"$lt": datetime.datetime.utcnow()}},
                 {"is_used": True}

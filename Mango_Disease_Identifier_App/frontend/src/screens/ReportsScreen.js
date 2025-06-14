@@ -15,6 +15,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import ScreenWithFooter from '../components/ScreenWithFooter';
 import { useOffline } from '../contexts/OfflineContext';
 import { BarChart } from 'react-native-chart-kit';
+import { DiseaseReportService } from '../services/api';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -32,9 +33,25 @@ const ReportsScreen = ({ navigation }) => {
   const loadReports = async () => {
     setLoading(true);
     try {
-      // In a real app, this would be an API call if online
-      // For now, we'll get data from AsyncStorage
-      const reportData = await AsyncStorage.getItem('diseaseReports');
+      let reportData;
+      
+      if (isOnline) {
+        // Fetch from server when online
+        try {
+          const serverReports = await DiseaseReportService.getReports();
+          reportData = JSON.stringify(serverReports);
+          // Update local storage with server data
+          await AsyncStorage.setItem('diseaseReports', reportData);
+        } catch (error) {
+          console.error('Error fetching reports from server:', error);
+          // Fallback to local data if server fetch fails
+          reportData = await AsyncStorage.getItem('diseaseReports');
+        }
+      } else {
+        // Use local data when offline
+        reportData = await AsyncStorage.getItem('diseaseReports');
+      }
+
       if (reportData) {
         const parsedData = JSON.parse(reportData);
         setReports(parsedData);

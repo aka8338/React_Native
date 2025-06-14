@@ -3,9 +3,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.user import User
 from bson.objectid import ObjectId
 
-user_bp = Blueprint("user", __name__)
+users = Blueprint("users", __name__)
 
-@user_bp.route("/profile", methods=["GET"])
+@users.route("/profile", methods=["GET"])
 @jwt_required()
 def get_profile():
     """Get user profile."""
@@ -26,7 +26,7 @@ def get_profile():
         }
     }), 200
 
-@user_bp.route("/profile", methods=["PUT"])
+@users.route("/profile", methods=["PUT"])
 @jwt_required()
 def update_profile():
     """Update user profile."""
@@ -56,7 +56,7 @@ def update_profile():
         }
     }), 200
 
-@user_bp.route("/change-password", methods=["POST"])
+@users.route("/change-password", methods=["POST"])
 @jwt_required()
 def change_password():
     """Change user password."""
